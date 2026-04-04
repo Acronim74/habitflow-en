@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HabitFlow</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="confCanvas"></canvas>
+
+<div class="app">
+
+  <!-- ════════════ TOP NAV ════════════ -->
+  <nav class="topnav">
+
+    <div class="nav-brand">
+      <div class="nav-brand-icon">🌿</div>
+      <span class="nav-brand-name">HabitFlow</span>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-screen="today"
+              type="button" onclick="navigate('today')">☀️ Сегодня</button>
+      <button class="nav-tab" data-screen="habits"
+              type="button" onclick="navigate('habits')">✅ Привычки</button>
+      <button class="nav-tab" data-screen="analytics"
+              type="button" onclick="navigate('analytics')">📊 Аналитика</button>
+      <button class="nav-tab" data-screen="badges"
+              type="button" onclick="navigate('badges')">🏅 Значки</button>
+    </div>
+
+    <div class="nav-right">
+      <button class="nav-action" type="button" title="Сохранить копию"
+              onclick="exportData()">💾</button>
+      <button class="nav-action" type="button" title="Загрузить копию"
+              onclick="triggerImport()">📂</button>
+      <button class="nav-action" type="button" title="Помощь"
+              onclick="openGuide()">❓</button>
+      <button class="nav-avatar" type="button" onclick="navigate('badges')">
+        <div class="nav-av-pic" id="navAvPic">🌱</div>
+        <span class="nav-av-text" id="navAvText">Искатель · 0 pts</span>
+      </button>
+    </div>
+
+    <input type="file" id="importFile" accept=".json,.html"
+           style="display:none" onchange="importData(event)">
+  </nav>
+
+  <!-- Нижняя навигация (только телефон) -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-screen="today"
+            type="button" onclick="navigate('today')">
+      <span class="bottom-nav-ico">☀️</span>
+      <span class="bottom-nav-lbl">Сегодня</span>
+    </button>
+    <button class="bottom-nav-item" data-screen="habits"
+            type="button" onclick="navigate('habits')">
+      <span class="bottom-nav-ico">✅</span>
+      <span class="bottom-nav-lbl">Привычки</span>
+    </button>
+    <button class="bottom-nav-item" data-screen="analytics"
+            type="button" onclick="navigate('analytics')">
+      <span class="bottom-nav-ico">📊</span>
+      <span class="bottom-nav-lbl">Аналитика</span>
+    </button>
+    <button class="bottom-nav-item" data-screen="badges"
+            type="button" onclick="navigate('badges')">
+      <span class="bottom-nav-ico">🏅</span>
+      <span class="bottom-nav-lbl">Значки</span>
+    </button>
+  </nav>
+
+  <!-- ════════════ ЭКРАН: СЕГОДНЯ ════════════ -->
+  <div class="screen active" id="screenToday">
+    <div class="page-grid">
+
+      <!-- ── Левая колонка: дашборд дня ── -->
+      <div class="panel panel-body" id="todayLeft">
+
+        <div class="panel-title" id="todayDate">Загрузка...</div>
+
+        <!-- Спидометр -->
+        <div style="text-align:center">
+          <svg id="gaugeSvg" viewBox="0 0 200 120"
+               style="width:100%;max-width:180px;height:auto;display:block;margin:0 auto">
+            <g id="gaugeSegments"></g>
+            <g id="gaugeNeedle" transform="rotate(-90 100 105)">
+              <line x1="100" y1="105" x2="100" y2="118"
+                    stroke="var(--accent)" stroke-width="2.5"
+                    stroke-linecap="round"/>
+              <line x1="100" y1="105" x2="100" y2="22"
+                    stroke="var(--text1)" stroke-width="2.5"
+                    stroke-linecap="round"/>
+              <circle cx="100" cy="105" r="5" fill="var(--text1)"/>
+              <circle cx="100" cy="105" r="2.5" fill="var(--surface)"/>
+            </g>
+            <text id="gaugePct" x="100" y="96" text-anchor="middle"
+                  font-size="22" font-weight="500"
+                  fill="var(--text1)" font-family="inherit">0%</text>
+            <text id="gaugeLbl" x="100" y="110" text-anchor="middle"
+                  font-size="9" fill="var(--text3)"
+                  font-family="inherit">выполнено</text>
+          </svg>
+          <div class="donut-meta" id="donutMeta">0 из 0</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Лучший стрик -->
+        <div class="flex" style="justify-content:space-between;
+                                  align-items:center;margin-bottom:12px">
+          <div>
+            <div style="font-size:11px;color:var(--text3)">Лучший стрик</div>
+            <div style="margin-top:2px">
+              <span style="font-size:18px;font-weight:500"
+                    id="streakVal">0</span>
+              <span style="font-size:12px;color:var(--text3)"> дней</span>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#e8720a;text-align:right"
+               id="streakName"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Настроение -->
+        <div id="moodSection" class="hidden">
+          <div class="divider"></div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);
+                        margin-bottom:8px">Настроение</div>
+            <div class="mood-row" id="moodRow"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Центр: карточки привычек ── -->
+      <div style="display:flex;flex-direction:column;gap:6px"
+           id="todayCenter">
+
+        <!-- Полезные -->
+        <div class="sec-header">
+          <span class="sec-label">Полезные привычки</span>
+          <span class="sec-badge" id="goodBadge">0 из 0</span>
+        </div>
+        <div id="goodList"
+             style="display:flex;flex-direction:column;gap:6px"></div>
+
+        <!-- Бонусные (скрыты по умолчанию) -->
+        <div id="bonusSection" class="hidden">
+          <div class="sec-header">
+            <span class="sec-label">Бонусные привычки</span>
+            <span class="sec-badge bonus">выходной · +10 pts</span>
+          </div>
+          <div id="bonusList"
+               style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+
+        <!-- Вредные (скрыты если нет) -->
+        <div id="badSection" class="hidden">
+          <div class="sec-header" style="margin-top:4px">
+            <span class="sec-label">Вредные привычки</span>
+            <span class="sec-badge bad" id="badBadge"></span>
+          </div>
+          <div id="badList"
+               style="display:flex;flex-direction:column;gap:6px"></div>
+
+          <!-- Прогресс вредных -->
+          <div class="progress-block">
+            <div class="progress-header">
+              <span class="progress-label">Сдержался сегодня</span>
+              <span class="progress-pct" id="badPct"
+                    style="color:var(--accent)">0 из 0</span>
+            </div>
+            <div class="bad-bar-track">
+              <div class="bad-bar-green" id="badBarGreen"
+                   style="width:0%"></div>
+              <div class="bad-bar-red"   id="badBarRed"
+                   style="width:0%"></div>
+            </div>
+            <div class="bar-legend">
+              <div class="bar-legend-item">
+                <div class="bar-legend-dot"
+                     style="background:var(--accent)"></div>
+                <span id="badLgGreen">Выдержал: 0</span>
+              </div>
+              <div class="bar-legend-item">
+                <div class="bar-legend-dot"
+                     style="background:var(--bad)"></div>
+                <span id="badLgRed">Срывов: 0</span>
+              </div>
+              <div class="bar-legend-item">
+                <div class="bar-legend-dot"
+                     style="background:var(--border2)"></div>
+                <span id="badLgGray">Не отмечено: 0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Правая колонка: статистика ── -->
+      <div id="todayRight" style="display:flex;flex-direction:column;gap:12px">
+
+        <!-- Хитмап 30 дней -->
+        <div class="panel panel-body">
+          <div class="panel-title">Активность · 30 дней</div>
+          <div class="heatmap" id="heatmap30"></div>
+          <div class="bar-legend" style="margin-top:8px;
+                                          justify-content:flex-end">
+            <div class="bar-legend-item">
+              <div class="bar-legend-dot"
+                   style="background:var(--border2)"></div>
+              <div class="bar-legend-dot"
+                   style="background:var(--accent3)"></div>
+              <div class="bar-legend-dot"
+                   style="background:var(--accent2)"></div>
+              <div class="bar-legend-dot"
+                   style="background:var(--accent)"></div>
+              <span style="margin-left:2px">меньше → больше</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- XP -->
+        <div class="panel panel-body">
+          <div class="xp-row">
+            <span class="xp-stage" id="xpStage">Искатель</span>
+            <span class="xp-next"  id="xpNext">→ Следопыт</span>
+          </div>
+          <div class="xp-track">
+            <div class="xp-fill" id="xpFill" style="width:0%"></div>
+          </div>
+          <div class="xp-pts-row">
+            <span id="xpCur">0 pts</span>
+            <span id="xpMax">500 pts</span>
+          </div>
+        </div>
+
+        <!-- Значки -->
+        <div class="panel panel-body">
+          <div class="panel-title" id="badgesTitle">Значки · 0 из 8</div>
+          <div class="badges-grid" id="badgesGrid"></div>
+        </div>
+
+        <!-- Добавить привычку -->
+        <button class="btn-add" type="button" onclick="openCreate('good')">
+          <span class="btn-add-ico">+</span>
+          Добавить привычку
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════ ОСТАЛЬНЫЕ ЭКРАНЫ ════════════ -->
+  <div class="screen" id="screenHabits"></div>
+  <div class="screen" id="screenAnalytics"></div>
+  <div class="screen" id="screenBadges"></div>
+
+</div><!-- .app -->
+
+<!-- ════════════ МОДАЛКИ ════════════ -->
+<div class="overlay" id="createOverlay"
+     onclick="closeCreate(event)">
+  <div class="modal" onclick="event.stopPropagation()"
+       id="createModal"></div>
+</div>
+
+<div class="overlay" id="deleteOverlay"
+     onclick="closeDelete(event)">
+  <div class="modal" onclick="event.stopPropagation()"
+       id="deleteModal"></div>
+</div>
+
+<div class="overlay" id="slipOverlay" onclick="closeSlip(event)">
+  <div class="modal" onclick="event.stopPropagation()"
+       id="slipModal"></div>
+</div>
+
+<!-- ════════════ ТОСТЫ ════════════ -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Тост бейджа -->
+<div id="badgeToast"
+     style="display:none;position:fixed;bottom:24px;right:24px;
+            background:var(--surface);border:0.5px solid var(--border);
+            border-radius:var(--r-lg);padding:12px 16px;
+            align-items:center;gap:12px;z-index:8000;
+            box-shadow:0 4px 20px rgba(0,0,0,.1)">
+  <div style="font-size:28px" id="badgeToastEmoji"></div>
+  <div>
+    <div style="font-size:13px;font-weight:500"
+         id="badgeToastTitle"></div>
+    <div style="font-size:11px;color:var(--text3)"
+         id="badgeToastDesc"></div>
+  </div>
+</div>
+
+<!-- ════════════ СКРИПТЫ ════════════ -->
+<script src="js/assets.js"></script>
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/render.js"></script>
+<script src="js/actions.js"></script>
+<script src="js/ui.js"></script>
+
+</body>
+</html>
