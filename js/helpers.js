@@ -275,7 +275,9 @@ function scheduleLabel(h) {
 
 // ── Конфетти ───────────────────────────────
 
-function spawnConfetti() {
+/** @param {{ lite?: boolean }} [opts] — lite: меньше частиц и кадров, не конкурирует с длинным CSS-flip */
+function spawnConfetti(opts) {
+  const lite = !!(opts && opts.lite);
   const canvas = document.getElementById('confCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -287,7 +289,10 @@ function spawnConfetti() {
     '#d4a017','#f0cc6a',
     '#4a90d9','#c47fd4','#e07b39',
   ];
-  const pieces = Array.from({ length: 130 }, () => ({
+  const count = lite ? 48 : 130;
+  const maxFrames = lite ? 72 : 160;
+  const fadeStart = lite ? 40 : 70;
+  const pieces = Array.from({ length: count }, () => ({
     x:       Math.random() * canvas.width,
     y:       -10 - Math.random() * 120,
     w:       6   + Math.random() * 8,
@@ -308,7 +313,7 @@ function spawnConfetti() {
       p.y   += p.vy;
       p.rot += p.vrot;
       p.vy  += 0.07;
-      if (frame > 70) p.opacity = Math.max(0, p.opacity - 0.013);
+      if (frame > fadeStart) p.opacity = Math.max(0, p.opacity - 0.013);
       ctx.save();
       ctx.globalAlpha = p.opacity;
       ctx.translate(p.x, p.y);
@@ -318,7 +323,7 @@ function spawnConfetti() {
       ctx.restore();
     });
     frame++;
-    if (frame < 160) requestAnimationFrame(draw);
+    if (frame < maxFrames) requestAnimationFrame(draw);
     else ctx.clearRect(0, 0, canvas.width, canvas.height);
   })();
 }

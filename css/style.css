@@ -851,10 +851,20 @@ body {
   pointer-events: none;
 }
 
+/* Ширина полосы/зоны чека не должна анимироваться одновременно с 3D-флипом */
+.hcard-flip-wrap .hcard .hcard-check-zone,
+.hcard-flip-wrap .hcard .hcard-bar,
+.hcard-flip-wrap .hcard .hcard-btn,
+.hcard-flip-wrap .hcard .hcard-done-ico,
+.hcard-flip-wrap .hcard .hcard-done-lbl {
+  transition: none !important;
+}
+
 .hcard {
   transform-style: preserve-3d;
-  transition: transform 3.2s cubic-bezier(0.19, 1, 0.22, 1),
-              border-color 0.5s ease;
+  /* Ровнее скорость по времени — резкий ease-out к концу выглядел как «дёрганье» */
+  transition: transform 3s cubic-bezier(0.45, 0, 0.55, 1),
+              border-color 0.65s ease;
   position: relative;
   min-height: 72px;
   height: auto;

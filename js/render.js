@@ -177,6 +177,56 @@ function _renderTodayChrome() {
   _renderBadgesGrid();
 }
 
+/** Лёгкое обновление дашборда во время флипа: без RAF спидометра и без тяжёлых перерисовок */
+function _renderTodayChromeForFlip() {
+  const tk = _todayKey();
+  const good    = habits.filter(h => !h.bad);
+  const bad     = habits.filter(h =>  h.bad);
+  const scheduled = good.filter(h => _isWorkDay(h, tk));
+  const bonuses   = good.filter(h => !_isWorkDay(h, tk));
+
+  const schedTotal = scheduled.length || 1;
+  const done  = scheduled.filter(h => h.checks?.[tk]).length;
+  const bonusDone = bonuses.filter(h => h.checks?.[tk]).length;
+  const basePct  = Math.round(done / schedTotal * 100);
+  const displayPct = Math.min(100, basePct);
+  document.getElementById('donutMeta').textContent =
+    done + ' из ' + scheduled.length + ' привычек';
+
+  if (_gaugeRafId) cancelAnimationFrame(_gaugeRafId);
+  _gaugeRafId = null;
+  _gaugeTargetPct = displayPct;
+  _gaugeCurrentPct = displayPct;
+  _drawGauge(displayPct);
+
+  let bestS = 0, bestName = '';
+  good.forEach(h => {
+    const s = calcStreak(h);
+    if (s > bestS) { bestS = s; bestName = (h.icon || '') + ' ' + h.name; }
+  });
+  document.getElementById('streakVal').textContent  = bestS;
+  document.getElementById('streakName').textContent = bestS > 0 ? bestName.trim() : '';
+
+  document.getElementById('goodBadge').textContent =
+    done + ' из ' + scheduled.length +
+    (bonusDone > 0 ? ' +' + bonusDone : '');
+
+  const bonusSection = document.getElementById('bonusSection');
+  if (bonuses.length > 0) {
+    bonusSection.classList.remove('hidden');
+  } else {
+    bonusSection.classList.add('hidden');
+  }
+
+  const badSection = document.getElementById('badSection');
+  if (bad.length > 0) {
+    badSection.classList.remove('hidden');
+    _renderBadProgress(bad, tk);
+  } else {
+    badSection.classList.add('hidden');
+  }
+}
+
 function renderToday() {
   const tk = _todayKey();
   const good    = habits.filter(h => !h.bad);
@@ -252,6 +302,57 @@ function _patchAllGoodHCards(tk) {
   const good = habits.filter(h => !h.bad);
   good.filter(h => _isWorkDay(h, tk)).forEach(h => _patchHCardFromModel(h, tk, false));
   good.filter(h => !_isWorkDay(h, tk)).forEach(h => _patchHCardFromModel(h, tk, true));
+}
+
+function _reorderGoodListIfNeeded(tk) {
+  const list = document.getElementById('goodList');
+  if (!list) return false;
+  const good = habits.filter(h => !h.bad);
+  const scheduled = good.filter(h => _isWorkDay(h, tk));
+  const sorted = _sortHabits(scheduled);
+  if (sorted.length !== list.children.length) return false;
+  for (let i = 0; i < sorted.length; i++) {
+    const inner = document.getElementById('hcard-' + sorted[i].id);
+    if (!inner) return false;
+    const wrap = inner.closest('.hcard-flip-wrap');
+    if (!wrap || wrap.parentNode !== list) return false;
+  }
+  sorted.forEach(h => {
+    const wrap = document.getElementById('hcard-' + h.id).closest('.hcard-flip-wrap');
+    list.appendChild(wrap);
+  });
+  return true;
+}
+
+function _reorderBonusListIfNeeded(tk) {
+  const bonusList = document.getElementById('bonusList');
+  const good = habits.filter(h => !h.bad);
+  const bonuses = good.filter(h => !_isWorkDay(h, tk));
+  if (bonuses.length === 0) {
+    return !bonusList || bonusList.children.length === 0;
+  }
+  if (!bonusList || bonuses.length !== bonusList.children.length) return false;
+  for (let i = 0; i < bonuses.length; i++) {
+    const inner = document.getElementById('hcard-' + bonuses[i].id);
+    if (!inner) return false;
+    const wrap = inner.closest('.hcard-flip-wrap');
+    if (!wrap || wrap.parentNode !== bonusList) return false;
+  }
+  bonuses.forEach(h => {
+    const wrap = document.getElementById('hcard-' + h.id).closest('.hcard-flip-wrap');
+    bonusList.appendChild(wrap);
+  });
+  return true;
+}
+
+/** После флипа: без innerHTML — только порядок + патч + полный chrome (без «прыжка» от пересборки) */
+function _refreshTodayAfterFlip(tk) {
+  if (!_reorderGoodListIfNeeded(tk) || !_reorderBonusListIfNeeded(tk)) {
+    renderToday();
+    return;
+  }
+  _patchAllGoodHCards(tk);
+  _renderTodayChrome();
 }
 
 // ── Настроение ─────────────────────────────

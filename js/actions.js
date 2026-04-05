@@ -6,6 +6,8 @@ function toggleCheck(habitId) {
   const tk = _todayKey();
   if (!h.checks) h.checks = {};
 
+  let allDoneCelebration = false;
+
   if (h.checks[tk]) {
     delete h.checks[tk];
     delete h.times?.[tk];
@@ -18,32 +20,64 @@ function toggleCheck(habitId) {
     const sched = good.filter(hh => _isWorkDay(hh, tk));
     const done  = sched.filter(hh => hh.checks?.[tk]).length;
     if (sched.length > 0 && done >= sched.length) {
+      allDoneCelebration = true;
+    }
+  }
+
+  saveData();
+
+  const reduceMotion = typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const el = document.getElementById('hcard-' + habitId);
+  const willFlip = currentScreen === 'today' && el && el.classList.contains('hcard') && !reduceMotion;
+
+  if (!willFlip) {
+    checkBadges();
+    if (allDoneCelebration) {
       spawnConfetti();
       showToast('🎉 100% — все привычки выполнены!');
       showPtsToast(25);
     }
   }
 
-  saveData();
-  checkBadges();
-
-  const reduceMotion = typeof window.matchMedia === 'function'
-    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const el = document.getElementById('hcard-' + habitId);
-  if (currentScreen === 'today' && el && el.classList.contains('hcard') && !reduceMotion) {
+  if (willFlip) {
     _patchAllGoodHCards(tk);
-    _renderTodayChrome();
-    renderNav();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        _renderTodayChromeForFlip();
+        renderNav();
+      });
+    });
+
+    if (allDoneCelebration) {
+      setTimeout(() => {
+        spawnConfetti({ lite: true });
+        showToast('🎉 100% — все привычки выполнены!');
+        showPtsToast(25);
+      }, 500);
+    }
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      checkBadges();
+      _refreshTodayAfterFlip(tk);
+      renderNav();
+    };
+
     const onEnd = (e) => {
+      if (e.target !== el) return;
       if (e.propertyName !== 'transform' && e.propertyName !== '-webkit-transform') return;
       el.removeEventListener('transitionend', onEnd);
-      renderToday();
+      clearTimeout(fallbackTimer);
+      finish();
     };
     el.addEventListener('transitionend', onEnd);
-    setTimeout(() => {
+    const fallbackTimer = setTimeout(() => {
       el.removeEventListener('transitionend', onEnd);
-      renderToday();
-    }, 4000);
+      finish();
+    }, 3500);
     return;
   }
 
