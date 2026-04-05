@@ -164,11 +164,7 @@ function closeSlip(e) {
 // ── Настроение ─────────────────────────────
 
 function saveMood(idx, tk) {
-  const h = habits.find(hh => !hh.bad);
-  if (!h) return;
-  if (!h.notes)     h.notes     = {};
-  if (!h.notes[tk]) h.notes[tk] = {};
-  h.notes[tk].mood = idx;
+  moodLog[tk] = idx;
   saveData();
   _renderMood(tk);
 }
@@ -422,8 +418,15 @@ function closeDelete(e) {
 // ── Экспорт / Импорт ─────────────────────
 
 function exportData() {
-  const data = JSON.stringify({ habits, archived, earnedBadges, gender,
-    savedAt: new Date().toISOString() }, null, 2);
+  const data = JSON.stringify({
+    habits,
+    archived,
+    earnedBadges,
+    gender,
+    moodLog,
+    moodEnabled,
+    savedAt: new Date().toISOString(),
+  }, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -448,6 +451,8 @@ function importData(event) {
       archived     = d.archived     || [];
       earnedBadges = d.earnedBadges || [];
       gender       = d.gender       || null;
+      moodLog      = (d.moodLog && typeof d.moodLog === 'object') ? d.moodLog : {};
+      moodEnabled  = d.moodEnabled || false;
       _migrateData();
       saveData();
       renderAll();

@@ -360,8 +360,7 @@ function _refreshTodayAfterFlip(tk) {
 function _renderMood(tk) {
   const row = document.getElementById('moodRow');
   row.innerHTML = '';
-  const h = habits.find(hh => !hh.bad);
-  const saved = h?.notes?.[tk]?.mood ?? -1;
+  const saved = moodLog[tk] ?? -1;
 
   MOOD_LABELS.forEach((lbl, i) => {
     const btn = document.createElement('button');

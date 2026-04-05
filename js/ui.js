@@ -905,13 +905,10 @@ function _renderMoodChart() {
   const tk    = _todayKey();
 
   const moodData = {};
-  const h = habits.find(hh => !hh.bad);
-  if (h) {
-    dates.forEach(dk => {
-      const m = h.notes?.[dk]?.mood;
-      if (m !== undefined && m !== null) moodData[dk] = m;
-    });
-  }
+  dates.forEach(dk => {
+    const m = moodLog[dk];
+    if (m !== undefined && m !== null) moodData[dk] = m;
+  });
 
   const MOOD_EMOJIS  = ['😞','😐','🙂','😊','🤩'];
   const MOOD_LABELS  = ['Плохо','Так себе','Нейтрально','Хорошо','Отлично'];

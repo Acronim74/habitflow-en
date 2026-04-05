@@ -3,6 +3,7 @@ let habits        = [];   // активные привычки
 let archived      = [];   // архивированные
 let earnedBadges  = [];   // id полученных бейджей
 let gender        = null; // 'female' | 'male' | null
+let moodLog       = {};   // { "YYYY-MM-DD": 0..4 }
 let moodEnabled   = false; // дневник настроения вкл/выкл
 let currentScreen = 'today';
 
@@ -24,6 +25,7 @@ function saveData() {
       archived,
       earnedBadges,
       gender,
+      moodLog,
       moodEnabled,
       savedAt: new Date().toISOString(),
     };
@@ -43,6 +45,7 @@ function loadData() {
     archived     = Array.isArray(d.archived)     ? d.archived     : [];
     earnedBadges = Array.isArray(d.earnedBadges) ? d.earnedBadges : [];
     gender       = d.gender || null;
+    moodLog      = (d.moodLog && typeof d.moodLog === 'object') ? d.moodLog : {};
     moodEnabled  = d.moodEnabled || false;
     _migrateData();
   } catch (e) {
@@ -63,4 +66,18 @@ function _migrateData() {
     if (!h.createdAt) h.createdAt = _todayKey();
     if (h.schedule === undefined) h.schedule = null;
   });
+
+  let moodMigrateDirty = false;
+  habits.forEach(h => {
+    if (h.notes) {
+      Object.entries(h.notes).forEach(([dk, note]) => {
+        if (note.mood !== undefined) {
+          if (moodLog[dk] === undefined) moodLog[dk] = note.mood;
+          delete note.mood;
+          moodMigrateDirty = true;
+        }
+      });
+    }
+  });
+  if (moodMigrateDirty) saveData();
 }
