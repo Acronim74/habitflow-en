@@ -226,44 +226,74 @@ function _buildHCard(h, tk, isBonus) {
         { hour:'2-digit', minute:'2-digit' })
     : '';
 
-  let cls = 'hcard';
-  if (isBonus && isDone) cls += ' hc-bonus-done';
-  else if (isBonus)      cls += ' hc-bonus';
-  else if (isDone)       cls += ' hc-done';
-  else if (_isNextCard(h)) cls += ' hc-active';
+  // Класс обёртки (для CSS transform)
+  let wrapCls = 'hcard';
+  if (isBonus && isDone)   wrapCls += ' hc-bonus-done';
+  else if (isBonus)        wrapCls += ' hc-bonus';
+  else if (isDone)         wrapCls += ' hc-done';
+  else if (_isNextCard(h)) wrapCls += ' hc-active';
 
-  let subText = streak > 0
+  // Подпись стрика
+  const subText = streak > 0
     ? `🔥 ${streak} дней подряд${scheduleLabel(h)}`
     : (scheduleLabel(h).slice(3) || 'Нет стрика');
-  let subCls = streak > 0 ? 'hcard-sub hs-streak' : 'hcard-sub';
-  if (isBonus) subCls += ' hs-bonus';
+  const subCls = streak > 0
+    ? 'hcard-sub hs-streak'
+    : 'hcard-sub' + (isBonus ? ' hs-bonus' : '');
 
-  const div = document.createElement('div');
-  div.className = cls;
-  div.id = 'hcard-' + h.id;
-  div.onclick = () => toggleCheck(h.id);
-  div.innerHTML = `
-    <span class="hcard-time">${esc(timeStr)}</span>
-    <div class="hcard-row">
-      <div class="hcard-done-zone">
-        <div class="hcard-done-ico">${isBonus ? '★' : '✓'}</div>
-        <div class="hcard-done-lbl">${isBonus ? 'бонус' : 'готово'}</div>
-      </div>
-      <div class="hcard-body">
-        <div class="hcard-top">
-          <span class="hcard-ico">${h.icon || '⭐'}</span>
-          <span class="hcard-name">${esc(h.name)}</span>
+  // Обратная сторона
+  const backCls  = 'hcard-back' + (isBonus ? ' hback-bonus' : '');
+  const backIco   = isBonus ? '★' : '✓';
+  const backTitle = isBonus ? 'Бонус засчитан!' : 'Выполнено!';
+
+  // Лицевая сторона — класс границы
+  let frontCls = 'hcard-front';
+  if (!isDone && isBonus)      frontCls += ' hc-bonus-front';
+  if (!isDone && _isNextCard(h)) frontCls += ' hc-active-front';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'hcard-flip-wrap';
+  wrap.innerHTML = `
+    <div class="${wrapCls}" id="hcard-${h.id}">
+
+      <!-- Лицевая сторона -->
+      <div class="${frontCls}">
+        <div class="hcard-row" onclick="toggleCheck('${h.id}')">
+          <div class="hcard-done-zone">
+            <div class="hcard-done-ico">${backIco}</div>
+            <div class="hcard-done-lbl">${isBonus ? 'бонус' : 'готово'}</div>
+          </div>
+          <div class="hcard-body">
+            <div class="hcard-top">
+              <span class="hcard-ico">${h.icon || '⭐'}</span>
+              <span class="hcard-name">${esc(h.name)}</span>
+            </div>
+            <div class="${subCls}">${esc(subText)}</div>
+          </div>
+          <div class="hcard-check-zone">
+            <div class="hcard-btn"></div>
+          </div>
         </div>
-        <div class="${subCls}">${esc(subText)}</div>
+        <div class="hcard-bar-track">
+          <div class="hcard-bar"></div>
+        </div>
       </div>
-      <div class="hcard-check-zone">
-        <div class="hcard-btn"></div>
+
+      <!-- Обратная сторона -->
+      <div class="${backCls}">
+        <div class="hcard-back-ico">${backIco}</div>
+        <div class="hcard-back-info">
+          <div class="hcard-back-title">${backTitle}</div>
+          <div class="hcard-back-time">${esc(timeStr) || '—'}</div>
+        </div>
+        <button type="button" class="hcard-back-undo"
+                onclick="toggleCheck('${h.id}')">
+          отменить
+        </button>
       </div>
-    </div>
-    <div class="hcard-bar-track">
-      <div class="hcard-bar"></div>
+
     </div>`;
-  return div;
+  return wrap;
 }
 
 function _isNextCard(h) {

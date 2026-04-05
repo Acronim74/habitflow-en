@@ -46,6 +46,10 @@ body {
   min-height: 100vh;
 }
 
+.app > * {
+  width: 100%;
+}
+
 /* ── Верхняя навигация ────────────────────── */
 .topnav {
   position: sticky;
@@ -54,10 +58,16 @@ body {
   height: 52px;
   background: var(--surface);
   border-bottom: 0.5px solid var(--border);
+  padding: 0 20px;
+}
+
+.topnav-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
   gap: 16px;
 }
 
@@ -164,6 +174,9 @@ body {
   padding: 12px;
   align-items: start;
   flex: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* ── Экраны ───────────────────────────────── */
@@ -1048,4 +1061,98 @@ body {
   #screenAnalytics #hmBadWrap > div {
     min-width: max-content;
   }
+}
+
+/* ── Флип карточки привычки ───────────────── */
+.hcard-flip-wrap {
+  perspective: 900px;
+}
+
+.hcard {
+  transform-style: preserve-3d;
+  transition: transform 1.45s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
+  position: relative;
+  min-height: 72px;
+  height: auto;
+}
+
+.hcard.hc-done,
+.hcard.hc-bonus-done {
+  transform: rotateY(180deg);
+  opacity: 1;
+}
+
+.hcard-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hcard-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  background: var(--accent);
+  border-radius: var(--r-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.hcard-back.hback-bonus {
+  background: var(--bonus);
+}
+
+.hcard-back-ico {
+  font-size: 22px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.hcard-back-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.hcard-back-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+}
+
+.hcard-back-time {
+  font-size: 11px;
+  color: rgba(255,255,255,.65);
+}
+
+.hcard-back-undo {
+  font-size: 11px;
+  color: rgba(255,255,255,.5);
+  cursor: pointer;
+  padding: 4px 10px;
+  border: 0.5px solid rgba(255,255,255,.25);
+  border-radius: var(--r-md);
+  transition: color .15s, border-color .15s;
+  background: transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hcard-back-undo:hover {
+  color: white;
+  border-color: rgba(255,255,255,.55);
 }
