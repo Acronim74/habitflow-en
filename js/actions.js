@@ -26,6 +26,27 @@ function toggleCheck(habitId) {
 
   saveData();
   checkBadges();
+
+  const reduceMotion = typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const el = document.getElementById('hcard-' + habitId);
+  if (currentScreen === 'today' && el && el.classList.contains('hcard') && !reduceMotion) {
+    _patchAllGoodHCards(tk);
+    _renderTodayChrome();
+    renderNav();
+    const onEnd = (e) => {
+      if (e.propertyName !== 'transform' && e.propertyName !== '-webkit-transform') return;
+      el.removeEventListener('transitionend', onEnd);
+      renderToday();
+    };
+    el.addEventListener('transitionend', onEnd);
+    setTimeout(() => {
+      el.removeEventListener('transitionend', onEnd);
+      renderToday();
+    }, 4000);
+    return;
+  }
+
   renderToday();
   renderNav();
 }

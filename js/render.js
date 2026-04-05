@@ -117,7 +117,8 @@ function renderNav() {
 
 // ── Экран Сегодня ──────────────────────────
 
-function renderToday() {
+/** Дашборд без пересборки списков полезных/бонусных/вредных карточек */
+function _renderTodayChrome() {
   const tk = _todayKey();
   const good    = habits.filter(h => !h.bad);
   const bad     = habits.filter(h =>  h.bad);
@@ -153,11 +154,6 @@ function renderToday() {
     document.getElementById('moodSection').classList.add('hidden');
   }
 
-  const goodList = document.getElementById('goodList');
-  goodList.innerHTML = '';
-  _sortHabits(scheduled).forEach(h => {
-    goodList.appendChild(_buildHCard(h, tk, false));
-  });
   document.getElementById('goodBadge').textContent =
     done + ' из ' + scheduled.length +
     (bonusDone > 0 ? ' +' + bonusDone : '');
@@ -165,9 +161,6 @@ function renderToday() {
   const bonusSection = document.getElementById('bonusSection');
   if (bonuses.length > 0) {
     bonusSection.classList.remove('hidden');
-    const bonusList = document.getElementById('bonusList');
-    bonusList.innerHTML = '';
-    bonuses.forEach(h => bonusList.appendChild(_buildHCard(h, tk, true)));
   } else {
     bonusSection.classList.add('hidden');
   }
@@ -175,19 +168,90 @@ function renderToday() {
   const badSection = document.getElementById('badSection');
   if (bad.length > 0) {
     badSection.classList.remove('hidden');
-    const badList = document.getElementById('badList');
-    badList.innerHTML = '';
-    bad.forEach(h => badList.appendChild(_buildBCard(h, tk)));
-    _renderBadProgress(bad, tk);
   } else {
     badSection.classList.add('hidden');
   }
 
   _renderHeatmap30();
-
   _renderXP();
-
   _renderBadgesGrid();
+}
+
+function renderToday() {
+  const tk = _todayKey();
+  const good    = habits.filter(h => !h.bad);
+  const bad     = habits.filter(h =>  h.bad);
+  const scheduled = good.filter(h => _isWorkDay(h, tk));
+  const bonuses   = good.filter(h => !_isWorkDay(h, tk));
+
+  _renderTodayChrome();
+
+  const goodList = document.getElementById('goodList');
+  goodList.innerHTML = '';
+  _sortHabits(scheduled).forEach(h => {
+    goodList.appendChild(_buildHCard(h, tk, false));
+  });
+
+  if (bonuses.length > 0) {
+    const bonusList = document.getElementById('bonusList');
+    bonusList.innerHTML = '';
+    bonuses.forEach(h => bonusList.appendChild(_buildHCard(h, tk, true)));
+  }
+
+  if (bad.length > 0) {
+    const badList = document.getElementById('badList');
+    badList.innerHTML = '';
+    bad.forEach(h => badList.appendChild(_buildBCard(h, tk)));
+    _renderBadProgress(bad, tk);
+  }
+}
+
+function _hCardWrapClass(h, tk, isBonus) {
+  const isDone = !!h.checks?.[tk];
+  let wrapCls = 'hcard';
+  if (isBonus && isDone)   wrapCls += ' hc-bonus-done';
+  else if (isBonus)        wrapCls += ' hc-bonus';
+  else if (isDone)         wrapCls += ' hc-done';
+  else if (_isNextCard(h)) wrapCls += ' hc-active';
+  return wrapCls;
+}
+
+/** Обновить существующую карточку в DOM (для CSS-анимации флипа без пересоздания узла) */
+function _patchHCardFromModel(h, tk, isBonus) {
+  const el = document.getElementById('hcard-' + h.id);
+  if (!el || !el.classList.contains('hcard')) return;
+
+  const streak = calcStreak(h);
+  const timeStr = h.times?.[tk]
+    ? new Date(h.times[tk]).toLocaleTimeString('ru-RU',
+        { hour: '2-digit', minute: '2-digit' })
+    : '';
+  const subText = streak > 0
+    ? `🔥 ${streak} дней подряд${scheduleLabel(h)}`
+    : (scheduleLabel(h).slice(3) || 'Нет стрика');
+  const subCls = streak > 0
+    ? 'hcard-sub hs-streak'
+    : 'hcard-sub' + (isBonus ? ' hs-bonus' : '');
+
+  el.className = _hCardWrapClass(h, tk, isBonus);
+  const sub = el.querySelector('.hcard-sub');
+  if (sub) {
+    sub.className = subCls;
+    sub.textContent = subText;
+  }
+  const timeEl = el.querySelector('.hcard-back-time');
+  if (timeEl) timeEl.textContent = timeStr || '—';
+
+  const back = el.querySelector('.hcard-back');
+  if (back) {
+    back.className = 'hcard-back' + (isBonus ? ' hback-bonus' : '');
+  }
+}
+
+function _patchAllGoodHCards(tk) {
+  const good = habits.filter(h => !h.bad);
+  good.filter(h => _isWorkDay(h, tk)).forEach(h => _patchHCardFromModel(h, tk, false));
+  good.filter(h => !_isWorkDay(h, tk)).forEach(h => _patchHCardFromModel(h, tk, true));
 }
 
 // ── Настроение ─────────────────────────────

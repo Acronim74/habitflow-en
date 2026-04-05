@@ -826,13 +826,35 @@ body {
 
 /* ── Флип карточки привычки ───────────────── */
 .hcard-flip-wrap {
-  perspective: 900px;
+  perspective: 1000px;
+}
+
+/* Базовый .hcard выше задаёт overflow:hidden — для 3D-flip это обрезает поворот */
+.hcard-flip-wrap .hcard {
+  overflow: visible;
+}
+
+/* Не даём :active scale(0.99) ломать rotateY во время клика */
+.hcard-flip-wrap .hcard:active {
+  transform: none;
+}
+.hcard-flip-wrap .hcard.hc-done:active,
+.hcard-flip-wrap .hcard.hc-bonus-done:active {
+  transform: rotateY(180deg);
+}
+
+/* На флип-карточке не показываем «выезд» зелёной полосы слева — только переворот */
+.hcard-flip-wrap .hcard .hcard-done-zone {
+  width: 0 !important;
+  transition: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .hcard {
   transform-style: preserve-3d;
-  transition: transform 1.45s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.35s ease;
+  transition: transform 3.2s cubic-bezier(0.19, 1, 0.22, 1),
+              border-color 0.5s ease;
   position: relative;
   min-height: 72px;
   height: auto;
