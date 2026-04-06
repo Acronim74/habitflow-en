@@ -432,69 +432,6 @@ function closeDelete(e) {
   document.getElementById('deleteOverlay').classList.remove('open');
 }
 
-// ── Онбординг ──────────────────────────────
-
-function loadDemoData() {
-  const today = _todayKey();
-  const yesterday = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    return d.getFullYear() + '-' +
-      String(d.getMonth()+1).padStart(2,'0') + '-' +
-      String(d.getDate()).padStart(2,'0');
-  })();
-  const twoDaysAgo = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 2);
-    return d.getFullYear() + '-' +
-      String(d.getMonth()+1).padStart(2,'0') + '-' +
-      String(d.getDate()).padStart(2,'0');
-  })();
-
-  // Глубокая копия демо-данных
-  habits = JSON.parse(JSON.stringify(DEMO_HABITS));
-
-  // Проставляем createdAt и несколько чеков для реалистичности
-  habits.forEach(h => {
-    h.createdAt = twoDaysAgo;
-  });
-
-  // Пробежка — отмечена вчера и позавчера
-  habits[0].checks[twoDaysAgo] = true;
-  habits[0].checks[yesterday]  = true;
-
-  // Чтение — отмечено вчера
-  habits[1].checks[yesterday]  = true;
-
-  // Медитация — отмечена позавчера и вчера
-  habits[2].checks[twoDaysAgo] = true;
-  habits[2].checks[yesterday]  = true;
-
-  archived     = [];
-  earnedBadges = [];
-  gender       = null;
-  moodLog      = { [yesterday]: 3, [twoDaysAgo]: 2 };
-  moodEnabled  = true;
-
-  _migrateData();
-  _syncCleanTodaySetFromData();
-  saveData();
-  renderAll();
-  closeOnboarding();
-  showToast('Демо-данные загружены · добавь свои привычки!');
-}
-
-function skipOnboarding() {
-  saveData();
-  renderAll();
-  closeOnboarding();
-}
-
-function closeOnboarding() {
-  const el = document.getElementById('onboardingScreen');
-  if (el) el.style.display = 'none';
-}
-
 // ── Экспорт / Импорт ─────────────────────
 
 function exportData() {

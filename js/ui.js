@@ -1,5 +1,18 @@
 // ── Навигация ─────────────────────────────
 
+let _obStep = 0;
+const _OB_TOTAL = 6;
+
+/** Короткие заголовки для строки прогресса (как в макете). */
+const _OB_HEADINGS = [
+  'ПРИВЕТСТВИЕ',
+  'ОТМЕТКИ',
+  'СОЗДАНИЕ ПРИВЫЧКИ',
+  'СЕРИИ И ОЧКИ',
+  'АНАЛИТИКА И ЗНАЧКИ',
+  'ТВОИ ДАННЫЕ',
+];
+
 function navigate(screen) {
   currentScreen = screen;
 
@@ -1162,6 +1175,291 @@ function _showBadgeToast(b) {
   setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
 
+// ── Онбординг-мастер ──────────────────────
+
+function _obRender() {
+  _obProgress();
+  _obContent();
+  _obFooterRender();
+}
+
+function _obProgress() {
+  const wrap = document.getElementById('obProgress');
+  if (!wrap) return;
+  const n = _obStep + 1;
+  let dots = '';
+  for (let i = 0; i < _OB_TOTAL; i++) {
+    const cls = i < _obStep ? 'done' : i === _obStep ? 'active' : '';
+    dots += `<div class="ob-dot ${cls}"></div>`;
+  }
+  wrap.innerHTML = `
+    <div class="ob-progress-head">Шаг ${n} из ${_OB_TOTAL} — ${_OB_HEADINGS[_obStep]}</div>
+    <div class="ob-progress-bar">
+      ${dots}
+      <span class="ob-step-label">${n} / ${_OB_TOTAL}</span>
+    </div>`;
+}
+
+function _obContent() {
+  const body = document.getElementById('obBody');
+  if (!body) return;
+  body.innerHTML = _obSteps()[_obStep];
+}
+
+function _obFooterRender() {
+  const footer = document.getElementById('obFooter');
+  if (!footer) return;
+  const isFirst = _obStep === 0;
+  const isLast  = _obStep === _OB_TOTAL - 1;
+
+  if (isFirst) {
+    footer.innerHTML = `
+      <button type="button" class="ob-btn-skip"
+              onclick="obSkip()">Пропустить</button>
+      <button type="button" class="ob-btn-next"
+              onclick="obNext()">Начать →</button>`;
+  } else if (isLast) {
+    footer.innerHTML = `
+      <button type="button" class="ob-btn-back"
+              onclick="obPrev()">← Назад</button>
+      <button type="button" class="ob-btn-demo"
+              onclick="loadDemoData()">Демо-данные</button>
+      <button type="button" class="ob-btn-next"
+              onclick="obSkip()">Начать!</button>`;
+  } else {
+    footer.innerHTML = `
+      <button type="button" class="ob-btn-back"
+              onclick="obPrev()">← Назад</button>
+      <button type="button" class="ob-btn-next"
+              onclick="obNext()">Далее →</button>`;
+  }
+}
+
+function obNext() {
+  if (_obStep < _OB_TOTAL - 1) {
+    _obStep++;
+    _obRender();
+  }
+}
+
+function obPrev() {
+  if (_obStep > 0) {
+    _obStep--;
+    _obRender();
+  }
+}
+
+function obSkip() {
+  const el = document.getElementById('onboardingScreen');
+  if (el) el.style.display = 'none';
+  saveData();
+  renderAll();
+}
+
+function loadDemoData() {
+  const yesterday = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return _dateKey(d);
+  })();
+  const twoDaysAgo = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 2);
+    return _dateKey(d);
+  })();
+
+  habits = JSON.parse(JSON.stringify(DEMO_HABITS));
+  habits.forEach(h => { h.createdAt = twoDaysAgo; });
+
+  habits[0].checks[twoDaysAgo] = true;
+  habits[0].checks[yesterday]  = true;
+  habits[1].checks[yesterday]  = true;
+  habits[2].checks[twoDaysAgo] = true;
+  habits[2].checks[yesterday]  = true;
+
+  archived     = [];
+  earnedBadges = [];
+  gender       = null;
+  moodLog      = { [yesterday]: 3, [twoDaysAgo]: 2 };
+  moodEnabled  = true;
+
+  _migrateData();
+  _syncCleanTodaySetFromData();
+  saveData();
+  obSkip();
+  showToast('Демо-данные загружены · добавь свои привычки!');
+}
+
+function _obSteps() {
+  return [
+
+    `<div class="ob-ico">🌿</div>
+     <div class="ob-title">Добро пожаловать в HabitFlow</div>
+     <div class="ob-text">Трекер привычек который работает полностью офлайн.
+       Твои данные хранятся только на этом устройстве — никаких серверов и подписок.</div>
+     <div class="ob-hint">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">За минуту покажем как всё устроено.
+         Или сразу начни — всё интуитивно.</div>
+     </div>`,
+
+    `<div class="ob-ico">✅</div>
+     <div class="ob-title">Отмечай привычки</div>
+     <div class="ob-text">Нажми кнопку справа — карточка перевернётся и
+       покажет время выполнения. Нажми «отменить» чтобы снять отметку.</div>
+     <div class="ob-preview">
+       <div class="ob-card-front">
+         <div class="ob-card-row">
+           <div class="ob-card-body">
+             <div class="ob-card-name">🏃 Утренняя пробежка</div>
+             <div class="ob-card-sub">Начни серию сегодня</div>
+           </div>
+           <div class="ob-card-check">
+             <div class="ob-card-btn"></div>
+           </div>
+         </div>
+         <div class="ob-card-bar"></div>
+       </div>
+       <div class="ob-card-back">
+         <div class="ob-card-back-ico">✓</div>
+         <div>
+           <div class="ob-card-back-title">Выполнено!</div>
+           <div class="ob-card-back-time">07:24</div>
+         </div>
+         <div class="ob-card-back-undo">отменить</div>
+       </div>
+     </div>
+     <div class="ob-hint">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">Для вредных привычек — две кнопки:
+         ✓ Выдержал или ✕ Был срыв.</div>
+     </div>`,
+
+    `<div class="ob-ico-plus" aria-hidden="true">+</div>
+     <div class="ob-title">Как создать привычку</div>
+     <div class="ob-text">Нажми «Добавить привычку» — откроется форма. Вот что в ней есть:</div>
+     <div class="ob-preview ob-preview-create">
+       <div class="ob-preview-label">Тип привычки</div>
+       <div class="ob-type-row">
+         <div class="ob-type-btn good">
+           <span class="ob-type-glyph" aria-hidden="true">✓</span>
+           Полезная
+         </div>
+         <div class="ob-type-btn bad">
+           <span class="ob-type-glyph" aria-hidden="true">🚫</span>
+           Вредная
+         </div>
+       </div>
+       <div class="ob-preview-label">Иконка</div>
+       <div class="ob-icon-row">
+         <div class="ob-icon-btn sel">🏃</div>
+         <div class="ob-icon-btn">📚</div>
+         <div class="ob-icon-btn">🧘</div>
+         <div class="ob-icon-btn">💪</div>
+         <div class="ob-icon-btn">💧</div>
+         <div class="ob-icon-btn">😴</div>
+         <div class="ob-icon-btn">🚫</div>
+         <div class="ob-icon-btn">🚬</div>
+       </div>
+       <div class="ob-preview-label">Название</div>
+       <div class="ob-field ob-field-placeholder">Утренняя пробежка</div>
+       <div class="ob-preview-label">Расписание</div>
+       <div class="ob-sched-row">
+         <div class="ob-sched-btn sel">Каждый день</div>
+         <div class="ob-sched-btn">Будни</div>
+         <div class="ob-sched-btn">Выходные</div>
+         <div class="ob-sched-btn">Свои дни</div>
+       </div>
+     </div>
+     <div class="ob-hint">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">Расписание влияет на прогресс дня. Привычка «Будни»
+         не считается пропуском в выходной — но её можно отметить как бонус.</div>
+     </div>
+     <div class="ob-hint">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">Для вредных привычек расписание недоступно — они
+         отслеживаются каждый день.</div>
+     </div>`,
+
+    `<div class="ob-ico">🔥</div>
+     <div class="ob-title">Серии и очки</div>
+     <div class="ob-text">Каждая отметка приносит очки.
+       Чем дольше серия — тем больше множитель.</div>
+     <div class="ob-pts-row">
+       <span class="ob-pts-pill good">Полезная +10 pts</span>
+       <span class="ob-pts-pill bad">Вредная +5 pts</span>
+       <span class="ob-pts-pill bonus">Бонус +10 pts</span>
+     </div>
+     <div class="ob-mult-card">
+       7+ дней подряд → <strong style="color:var(--accent)">×2</strong><br>
+       30+ дней подряд → <strong style="color:var(--accent)">×3</strong><br>
+       100+ дней подряд → <strong style="color:var(--accent)">×5</strong>
+     </div>
+     <div class="ob-hint" style="margin-top:10px">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">Закрыл все запланированные привычки за день —
+         дополнительно +25 pts.</div>
+     </div>`,
+
+    `<div class="ob-ico">📊</div>
+     <div class="ob-title">Аналитика и значки</div>
+     <div class="ob-text">В аналитике — тепловые карты за неделю, месяц,
+       квартал или год. В значках — твой персонаж растёт по мере
+       накопления очков.</div>
+     <div class="ob-badge-row">
+       <div class="ob-badge-item">
+         <div class="ob-badge-ico">🔥</div>
+         <div class="ob-badge-lbl">Первый огонь</div>
+       </div>
+       <div class="ob-badge-item">
+         <div class="ob-badge-ico">💎</div>
+         <div class="ob-badge-lbl">Бриллиант</div>
+       </div>
+       <div class="ob-badge-item">
+         <div class="ob-badge-ico locked">🏆</div>
+         <div class="ob-badge-lbl">Чемпион</div>
+       </div>
+       <div class="ob-badge-item">
+         <div class="ob-badge-ico locked">⚡</div>
+         <div class="ob-badge-lbl">Центурион</div>
+       </div>
+       <div class="ob-badge-item">
+         <div class="ob-badge-ico locked">🍀</div>
+         <div class="ob-badge-lbl">Удача</div>
+       </div>
+     </div>
+     <div class="ob-hint">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">Стадии: Начало → В ритме → Устойчивость →
+         Сила привычки → Опора → Мастер</div>
+     </div>`,
+
+    `<div class="ob-ico">💾</div>
+     <div class="ob-title">Твои данные в безопасности</div>
+     <div class="ob-text">Всё хранится локально на этом устройстве.
+       Делай резервные копии через кнопки в навбаре.</div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">💾</div>
+       <div class="ob-data-text">Экспорт — скачать резервную копию (.json)</div>
+     </div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">📂</div>
+       <div class="ob-data-text">Импорт — восстановить из файла</div>
+     </div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">❓</div>
+       <div class="ob-data-text">Помощь — полная документация</div>
+     </div>
+     <div class="ob-hint" style="margin-top:4px">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">Попробуй демо-данные чтобы увидеть приложение
+         в действии — их можно удалить в любой момент.</div>
+     </div>`,
+  ];
+}
+
+
 // ── Помощь (модалка — тот же HTML-контент, без отдельного окна) ──
 
 const GUIDE_MODAL_HTML = `
@@ -1307,7 +1605,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const isFirstRun = !localStorage.getItem(LS_KEY);
   const onboarding = document.getElementById('onboardingScreen');
   if (onboarding) {
-    onboarding.style.display = isFirstRun ? 'flex' : 'none';
+    if (isFirstRun) {
+      _obStep = 0;
+      _obRender();
+      onboarding.style.display = 'flex';
+    } else {
+      onboarding.style.display = 'none';
+    }
   }
 
   const savedTheme = localStorage.getItem('habitflow_theme') || 'light';
