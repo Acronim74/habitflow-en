@@ -19,6 +19,14 @@ function _dateKey(d) {
   return `${y}-${m}-${day}`;
 }
 
+/** Локальная полночь для YYYY-MM-DD (не new Date(str) — в UTC иначе ломаются сравнения в восточных TZ). */
+function _localMidnight(dateKeyStr) {
+  if (!dateKeyStr) return new Date(0);
+  const p = String(dateKeyStr).split('-').map(Number);
+  if (p.length < 3 || p.some(n => Number.isNaN(n))) return new Date(0);
+  return new Date(p[0], p[1] - 1, p[2]);
+}
+
 function _daysAgo(dateKeyStr) {
   const [y, m, d] = dateKeyStr.split('-').map(Number);
   const past = new Date(y, m - 1, d);
@@ -82,7 +90,7 @@ function calcCleanStreakAt(h, dateKeyStr) {
   let streak = 0;
   const [y, m, d] = dateKeyStr.split('-').map(Number);
   const date = new Date(y, m - 1, d);
-  const created = new Date(h.createdAt);
+  const created = _localMidnight(h.createdAt);
   while (date >= created) {
     const key = _dateKey(date);
     if (h.slips?.[key]) break;
@@ -118,11 +126,11 @@ function calcPoints() {
   habits.forEach(h => {
     Object.keys(h.checks || {}).forEach(k => allDates.add(k));
     Object.keys(h.slips  || {}).forEach(k => allDates.add(k));
+    Object.keys(h.clean || {}).forEach(k => allDates.add(k));
   });
 
   habits.filter(h => h.bad).forEach(h => {
-    const created = new Date(h.createdAt);
-    const d = new Date(created);
+    const d = _localMidnight(h.createdAt);
     while (d <= TODAY) {
       allDates.add(_dateKey(d));
       d.setDate(d.getDate() + 1);
@@ -140,10 +148,11 @@ function calcPoints() {
 
     habits.forEach(h => {
       if (h.bad) {
-        const created = new Date(h.createdAt);
-        const day = new Date(dk.replace(/-/g, '/'));
+        const day = _localMidnight(dk);
+        const created = _localMidnight(h.createdAt);
         if (day < created) return;
         if (h.slips?.[dk]) return;
+        if (!h.clean?.[dk]) return;
         const base = 5;
         const streak = calcCleanStreakAt(h, dk);
         let mult = 1;

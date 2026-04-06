@@ -51,9 +51,18 @@ function loadData() {
     moodLog      = (d.moodLog && typeof d.moodLog === 'object') ? d.moodLog : {};
     moodEnabled  = d.moodEnabled || false;
     _migrateData();
+    _syncCleanTodaySetFromData();
   } catch (e) {
     console.error('Ошибка загрузки:', e);
   }
+}
+
+function _syncCleanTodaySetFromData() {
+  const tk = _todayKey();
+  cleanTodaySet = new Set();
+  habits.filter(h => h.bad).forEach(h => {
+    if (h.clean?.[tk]) cleanTodaySet.add(h.id);
+  });
 }
 
 // ── Миграция старых данных ─────────────────
@@ -65,6 +74,7 @@ function _migrateData() {
     if (!h.times)     h.times    = {};
     if (!h.notes)     h.notes    = {};
     if (!h.slips)     h.slips    = {};
+    if (!h.clean)     h.clean    = {};
     if (!h.category)  h.category = '';
     if (!h.icon)      h.icon     = h.bad ? '🚫' : '⭐';
     if (!h.createdAt) h.createdAt = _todayKey();

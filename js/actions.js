@@ -91,7 +91,9 @@ function markBadClean(habitId) {
   const h = habits.find(x => x.id === habitId);
   if (!h) return;
   if (!h.slips) h.slips = {};
+  if (!h.clean) h.clean = {};
   cleanTodaySet.add(habitId);
+  h.clean[_todayKey()] = true;
   delete h.slips[_todayKey()];
   saveData();
   if (!_flipBadCard(habitId, 'clean')) {
@@ -106,7 +108,9 @@ function resetBadCard(habitId) {
   const h = habits.find(x => x.id === habitId);
   if (!h) return;
   if (!h.slips) h.slips = {};
+  if (!h.clean) h.clean = {};
   cleanTodaySet.delete(habitId);
+  delete h.clean[_todayKey()];
   delete h.slips[_todayKey()];
   saveData();
   if (!_unflipBadCard(habitId)) {
@@ -152,6 +156,7 @@ function confirmSlip(habitId) {
   if (!h.slips) h.slips = {};
   h.slips[tk] = true;
   cleanTodaySet.delete(habitId);
+  if (h.clean) delete h.clean[tk];
   if (!h.notes) h.notes = {};
   if (!h.notes[tk]) h.notes[tk] = {};
   if (trigger) h.notes[tk].trigger = trigger;
@@ -349,6 +354,7 @@ function saveNewHabit() {
     schedule:  _createType === 'bad' ? null : _createSchedule,
     checks:    {},
     slips:     {},
+    clean:     {},
     times:     {},
     notes:     {},
     createdAt: _todayKey(),
@@ -470,6 +476,8 @@ function loadDemoData() {
   moodLog      = { [yesterday]: 3, [twoDaysAgo]: 2 };
   moodEnabled  = true;
 
+  _migrateData();
+  _syncCleanTodaySetFromData();
   saveData();
   renderAll();
   closeOnboarding();
@@ -557,6 +565,7 @@ function importData(event) {
       moodEnabled  = d.moodEnabled  || false;
 
       _migrateData();
+      _syncCleanTodaySetFromData();
       saveData();
       renderAll();
       showToast('✓ Загружено: ' + habits.length + ' привычек');

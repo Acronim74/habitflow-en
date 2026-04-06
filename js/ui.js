@@ -306,21 +306,16 @@ function _buildGoodData(dates) {
 function _buildBadData(dates) {
   const bad = habits.filter(h => h.bad);
   const result = {};
-  const tk = _todayKey();
   dates.forEach(dk => {
     const slips = bad.filter(h => h.slips?.[dk]).length;
     let clean = 0;
     let neutral = 0;
     bad.forEach(h => {
-      const day = new Date(dk.replace(/-/g, '/'));
-      if (day < new Date(h.createdAt)) return;
+      const day = _localMidnight(dk);
+      if (day < _localMidnight(h.createdAt)) return;
       if (h.slips?.[dk]) return;
-      if (dk === tk) {
-        if (cleanTodaySet.has(h.id)) clean++;
-        else neutral++;
-      } else {
-        clean++;
-      }
+      if (h.clean?.[dk]) clean++;
+      else neutral++;
     });
     result[dk] = {
       slips,
@@ -875,7 +870,7 @@ function _renderHmBad() {
     let s = 0, d = new Date(TODAY);
     while (true) {
       const v = bData[_dateKey(d)];
-      if (!v || v.slips > 0) break;
+      if (!v || v.slips > 0 || v.neutral > 0) break;
       s++; d.setDate(d.getDate()-1);
     }
     return s;
@@ -1167,31 +1162,117 @@ function _showBadgeToast(b) {
   setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
 
-// ── Помощь (модалка в приложении — работает на телефоне и планшете) ──
+// ── Помощь (модалка — тот же HTML-контент, без отдельного окна) ──
+
+const GUIDE_MODAL_HTML = `
+<div class="wrap">
+
+  <h1>🌿 HabitFlow</h1>
+  <p class="subtitle">Офлайн-трекер привычек · данные хранятся только на этом устройстве</p>
+
+  <h2>Экраны приложения</h2>
+
+  <div class="card">
+    <div class="card-title">☀️ Сегодня</div>
+    <p>Главный экран. Показывает прогресс дня, карточки привычек и статистику.
+    Отмечай привычки здесь — карточка перевернётся и покажет время выполнения.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✅ Привычки</div>
+    <p>Список всех привычек. Здесь можно добавить новую, отправить в архив или удалить.
+    Также здесь включается и выключается дневник настроения.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Аналитика</div>
+    <p>Тепловые карты активности за неделю, месяц, квартал или год.
+    Отдельные карты для полезных и вредных привычек.
+    Если включён дневник настроения — появится линейный график настроения.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏅 Значки</div>
+    <p>Твой персонаж и достижения. Стадии развития: Начало → В ритме → Устойчивость →
+    Сила привычки → Опора → Мастер. Значки получаешь за конкретные результаты.</p>
+  </div>
+
+  <h2>Типы привычек</h2>
+
+  <div class="card">
+    <span class="tag tag-good">Полезная</span>
+    <p>Нажми кнопку справа — карточка перевернётся. Показывает время отметки и кнопку
+    «отменить». Отмечай каждый день чтобы наращивать серию.</p>
+    <div class="divider"></div>
+    <p><span class="pts">+10 pts</span> за каждую отметку &nbsp;·&nbsp;
+    <span class="pts">+25 pts</span> если закрыл все запланированные за день</p>
+  </div>
+
+  <div class="card">
+    <span class="tag tag-bad">Вредная</span>
+    <p>Две кнопки: ✓ Выдержал или ✕ Был срыв. После нажатия карточка перевернётся —
+    зелёная если выдержал, красная если был срыв. Нажми на цвет чтобы отменить.</p>
+    <div class="divider"></div>
+    <p><span class="pts">+5 pts</span> за чистый день · при срыве очки не начисляются</p>
+  </div>
+
+  <div class="card">
+    <span class="tag tag-bonus">Бонусная</span>
+    <p>Полезная привычка с расписанием (например «Будни»). В выходной она становится
+    бонусной — можно отметить добровольно и получить дополнительные очки.</p>
+    <div class="divider"></div>
+    <p><span class="pts">+10 pts</span> за бонусную отметку</p>
+  </div>
+
+  <h2>Серии и множители</h2>
+
+  <div class="card">
+    <p>Чем дольше серия — тем больше очков за каждую отметку:</p>
+    <ul style="margin-top: 8px;">
+      <li>7+ дней подряд: <span class="pts">×2</span></li>
+      <li>30+ дней подряд: <span class="pts">×3</span></li>
+      <li>100+ дней подряд: <span class="pts">×5</span></li>
+    </ul>
+  </div>
+
+  <h2>Расписание</h2>
+
+  <div class="card">
+    <p>При создании привычки можно выбрать расписание: каждый день, будни, выходные
+    или свои дни. В дни когда привычка не запланирована — она не влияет на прогресс,
+    но её всё равно можно отметить как бонусную.</p>
+  </div>
+
+  <h2>Данные и резервные копии</h2>
+
+  <div class="card">
+    <p>Данные хранятся в браузере на этом устройстве. Если очистить данные браузера —
+    история может быть потеряна.</p>
+    <div class="divider"></div>
+    <p>💾 <strong>Экспорт</strong> — скачивает файл резервной копии (.json)<br>
+    📂 <strong>Импорт</strong> — загружает ранее сохранённый файл.<br>
+    Делай резервные копии регулярно, особенно перед обновлением браузера.</p>
+  </div>
+
+  <h2>Темы оформления</h2>
+
+  <div class="card">
+    <p>Переключатель тем находится в навбаре рядом с аватаром.
+    Доступны четыре темы: ☀️ Светлая, 🌙 Тёмная, ◈ Трон, ◉ Blade Runner.</p>
+  </div>
+
+  <p class="footer">HabitFlow · работает полностью офлайн</p>
+
+</div>
+`;
 
 function openGuide() {
   const body = document.getElementById('guideBody');
-  const ov   = document.getElementById('guideOverlay');
+  const ov = document.getElementById('guideOverlay');
   if (!body || !ov) return;
 
   if (!body.dataset.ready) {
-    body.innerHTML = `
-<h2>Полезные привычки</h2>
-<p>Нажми на кнопку справа от карточки чтобы отметить выполнение.
-Кнопка переедет на левую сторону — это знак что дело сделано.</p>
-<h2>Вредные привычки</h2>
-<p>Зелёная кнопка — выдержал. Красная — был срыв.
-После выбора нажми на цветную зону слева чтобы изменить отметку.</p>
-<h2>Бонусные привычки</h2>
-<p>Если сегодня выходной, привычки из расписания пропадают.
-Но ты всё равно можешь отметить их — это бонус, +10 pts каждая.</p>
-<h2>Очки и стадии</h2>
-<ul>
-  <li>Полезная привычка: +10 pts</li>
-  <li>Вредная привычка (чистый день): +5 pts</li>
-  <li>Все привычки за день: +25 pts</li>
-  <li>Стрик 7+ дней: ×2; 30+ дней: ×3; 100+ дней: ×5</li>
-</ul>`;
+    body.innerHTML = GUIDE_MODAL_HTML;
     body.dataset.ready = '1';
   }
 
@@ -1200,8 +1281,8 @@ function openGuide() {
 
 function closeGuide(e) {
   if (e && e.target !== document.getElementById('guideOverlay')) return;
-  const ov = document.getElementById('guideOverlay');
-  if (ov) ov.classList.remove('open');
+  const el = document.getElementById('guideOverlay');
+  if (el) el.classList.remove('open');
 }
 
 // ── Инициализация ─────────────────────────
