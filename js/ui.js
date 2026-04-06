@@ -1249,6 +1249,13 @@ function obPrev() {
   }
 }
 
+function openOnboarding() {
+  _obStep = 0;
+  _obRender();
+  const el = document.getElementById('onboardingScreen');
+  if (el) el.style.display = 'flex';
+}
+
 function obSkip() {
   const el = document.getElementById('onboardingScreen');
   if (el) el.style.display = 'none';
