@@ -419,6 +419,7 @@ function closeDelete(e) {
 
 function exportData() {
   const data = JSON.stringify({
+    schemaVersion: SCHEMA_VERSION,
     habits,
     archived,
     earnedBadges,
@@ -443,24 +444,58 @@ function triggerImport() {
 function importData(event) {
   const file = event.target.files?.[0];
   if (!file) return;
+
   const reader = new FileReader();
   reader.onload = e => {
     try {
       const d = JSON.parse(e.target.result);
-      habits       = d.habits       || [];
-      archived     = d.archived     || [];
-      earnedBadges = d.earnedBadges || [];
+
+      // Проверка что файл похож на данные HabitFlow
+      if (!d.habits && !d.archived && !d.earnedBadges) {
+        showToast('Файл не похож на резервную копию HabitFlow');
+        event.target.value = '';
+        return;
+      }
+
+      // Подсчёт текущих данных для предупреждения
+      const currentCount = habits.length + archived.length;
+      const importCount  = (d.habits?.length || 0) + (d.archived?.length || 0);
+
+      if (currentCount > 0) {
+        const ok = confirm(
+          'Текущие данные будут заменены данными из файла.\n\n' +
+          'Сейчас: ' + currentCount + ' привычек\n' +
+          'В файле: ' + importCount  + ' привычек\n\n' +
+          'Продолжить?'
+        );
+        if (!ok) {
+          event.target.value = '';
+          return;
+        }
+      }
+
+      // Запускаем миграции схемы
+      _runMigrations(d);
+
+      habits       = Array.isArray(d.habits)       ? d.habits       : [];
+      archived     = Array.isArray(d.archived)     ? d.archived     : [];
+      earnedBadges = Array.isArray(d.earnedBadges) ? d.earnedBadges : [];
       gender       = d.gender       || null;
       moodLog      = (d.moodLog && typeof d.moodLog === 'object') ? d.moodLog : {};
-      moodEnabled  = d.moodEnabled || false;
+      moodEnabled  = d.moodEnabled  || false;
+
       _migrateData();
       saveData();
       renderAll();
-      showToast('✓ Данные загружены');
-    } catch {
-      showToast('Ошибка чтения файла');
+      showToast('✓ Загружено: ' + habits.length + ' привычек');
+
+    } catch (err) {
+      console.error('Ошибка импорта:', err);
+      showToast('Ошибка: файл повреждён или имеет неверный формат');
     }
+
+    event.target.value = '';
   };
+
   reader.readAsText(file);
-  event.target.value = '';
 }
