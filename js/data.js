@@ -77,3 +77,63 @@ const CATEGORIES = [
 ];
 
 // Системы очков (справочно в комментариях в ТЗ)
+
+// ── Демо-данные для онбординга ─────────────
+const DEMO_HABITS = [
+  {
+    id: 'demo-1',
+    name: 'Утренняя пробежка',
+    icon: '🏃',
+    category: 'Спорт',
+    desc: 'Бег 20–30 минут каждое утро',
+    bad: false,
+    schedule: null,
+    checks: {},
+    slips: {},
+    times: {},
+    notes: {},
+    createdAt: '',
+  },
+  {
+    id: 'demo-2',
+    name: 'Читать 20 минут',
+    icon: '📚',
+    category: 'Учёба',
+    desc: 'Любая книга перед сном',
+    bad: false,
+    schedule: [0,1,2,3,4],
+    checks: {},
+    slips: {},
+    times: {},
+    notes: {},
+    createdAt: '',
+  },
+  {
+    id: 'demo-3',
+    name: 'Медитация',
+    icon: '🧘',
+    category: 'Здоровье',
+    desc: '10 минут утром',
+    bad: false,
+    schedule: null,
+    checks: {},
+    slips: {},
+    times: {},
+    notes: {},
+    createdAt: '',
+  },
+  {
+    id: 'demo-4',
+    name: 'Не курить',
+    icon: '🚫',
+    category: '',
+    desc: '',
+    bad: true,
+    schedule: null,
+    checks: {},
+    slips: {},
+    times: {},
+    notes: {},
+    createdAt: '',
+  },
+];

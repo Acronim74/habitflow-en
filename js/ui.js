@@ -1200,6 +1200,14 @@ function openGuide() {
 
 document.addEventListener('DOMContentLoaded', () => {
   loadData();
+
+  // Показываем онбординг только при первом запуске
+  const isFirstRun = !localStorage.getItem(LS_KEY);
+  const onboarding = document.getElementById('onboardingScreen');
+  if (onboarding) {
+    onboarding.style.display = isFirstRun ? 'flex' : 'none';
+  }
+
   navigate('today');
   renderNav();
   checkBadges();
