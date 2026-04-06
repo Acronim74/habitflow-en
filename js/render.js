@@ -236,7 +236,7 @@ function _patchHCardFromModel(h, tk, isBonus) {
     : '';
   const subText = streak > 0
     ? `🔥 ${streak} дней подряд${scheduleLabel(h)}`
-    : (scheduleLabel(h).slice(3) || 'Нет стрика');
+    : (scheduleLabel(h).slice(3) || 'Начни серию сегодня');
   const subCls = streak > 0
     ? 'hcard-sub hs-streak'
     : 'hcard-sub' + (isBonus ? ' hs-bonus' : '');
@@ -309,6 +309,7 @@ function _refreshTodayAfterFlip(tk) {
 
 function _renderMood(tk) {
   const row = document.getElementById('moodRow');
+  if (!row) return;
   row.innerHTML = '';
   const saved = moodLog[tk] ?? -1;
 
@@ -316,15 +317,22 @@ function _renderMood(tk) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'mood-btn' + (saved === i ? ' selected' : '');
-    if (typeof MOOD_IMAGES !== 'undefined' && MOOD_IMAGES[i] && MOOD_IMAGES[i].src) {
-      btn.innerHTML = `<img src="${MOOD_IMAGES[i].src}"
-        alt="${esc(lbl)}" style="width:22px;height:22px;object-fit:cover;
-        border-radius:50%">`;
-    } else {
-      const emojis = ['😞','😐','🙂','😊','🤩'];
-      btn.textContent = emojis[i] || '·';
-    }
     btn.title = lbl;
+
+    const isSelected = saved === i;
+    const color = MOOD_COLORS[i];
+
+    btn.innerHTML = `
+      <svg width="22" height="22" viewBox="0 0 22 22"
+           xmlns="http://www.w3.org/2000/svg">
+        <circle cx="11" cy="11" r="10"
+                fill="${color}"
+                opacity="${isSelected ? 1 : 0.8}"/>
+        ${isSelected
+          ? '<circle cx="11" cy="11" r="4" fill="white" opacity="0.7"/>'
+          : ''}
+      </svg>`;
+
     btn.onclick = () => saveMood(i, tk);
     row.appendChild(btn);
   });
@@ -348,14 +356,14 @@ function _buildHCard(h, tk, isBonus) {
 
   const subText = streak > 0
     ? `🔥 ${streak} дней подряд${scheduleLabel(h)}`
-    : (scheduleLabel(h).slice(3) || 'Нет стрика');
+    : (scheduleLabel(h).slice(3) || 'Начни серию сегодня');
   const subCls = streak > 0
     ? 'hcard-sub hs-streak'
     : 'hcard-sub' + (isBonus ? ' hs-bonus' : '');
 
   const backCls  = 'hcard-back' + (isBonus ? ' hback-bonus' : '');
   const backIco  = isBonus ? '★' : '✓';
-  const backTitle = isBonus ? 'Бонус засчитан!' : 'Выполнено!';
+  const backTitle = isBonus ? 'Отлично!' : 'Выполнено!';
 
   const wrap = document.createElement('div');
   wrap.className = 'hcard-flip-wrap';
@@ -430,10 +438,10 @@ function _buildBCard(h, tk) {
   if (isSlipped) state = 'slipped';
 
   const subText = isClean
-    ? `${streak} чистых дней подряд`
+    ? `${streak} дней без срыва`
     : isSlipped
-    ? 'Стрик сброшен · завтра новый шанс'
-    : `${streak} чист. дн. · отметь сегодня`;
+    ? 'Серия прервана · завтра новый шанс'
+    : `${streak} дней без срыва · отметь сегодня`;
   const subCls = isClean   ? 'bcard-sub bs-ok'
                : isSlipped ? 'bcard-sub bs-bad'
                : 'bcard-sub';
@@ -441,7 +449,7 @@ function _buildBCard(h, tk) {
   // Обратная сторона зависит от действия
   const backBg    = isClean ? 'var(--accent)' : 'var(--bad)';
   const backIco   = isClean ? '✓' : '✕';
-  const backTitle = isClean ? 'Сдержался!' : 'Срыв записан';
+  const backTitle = isClean ? 'Выдержал!' : 'Срыв записан';
   const backSub   = isClean
     ? streak + ' чистых дней'
     : 'Завтра новый шанс';

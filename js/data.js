@@ -7,17 +7,17 @@ const TODAY  = new Date();
 // Поля f (female) и m (male) с base64 PNG
 // будут добавлены из assets.js
 const STAGES = [
-  { pts:0,     nameRU:'Искатель',   emoji:'🌱',
+  { pts:0,     nameRU:'Начало',        emoji:'🌱',
     color:'#52b788', glow:'#95d5b2', ring:'#2d6a4f' },
-  { pts:500,   nameRU:'Следопыт',   emoji:'🏃',
+  { pts:500,   nameRU:'В ритме',       emoji:'🏃',
     color:'#4a90d9', glow:'#89c4f0', ring:'#2167a8' },
-  { pts:2000,  nameRU:'Воин',       emoji:'⚔️',
+  { pts:2000,  nameRU:'Устойчивость',  emoji:'⚔️',
     color:'#e07b39', glow:'#f0b07a', ring:'#b05a1a' },
-  { pts:6000,  nameRU:'Королева',   emoji:'👑',
+  { pts:6000,  nameRU:'Сила привычки', emoji:'👑',
     color:'#c47fd4', glow:'#dba8e8', ring:'#8e3fa8' },
-  { pts:15000, nameRU:'Легенда',    emoji:'🎯',
+  { pts:15000, nameRU:'Опора',         emoji:'🎯',
     color:'#e85d4a', glow:'#f5a09a', ring:'#b02a1a' },
-  { pts:35000, nameRU:'Властитель', emoji:'🔥',
+  { pts:35000, nameRU:'Мастер',        emoji:'🔥',
     color:'#d4a017', glow:'#f0cc6a', ring:'#a07010' },
 ];
 
@@ -59,7 +59,16 @@ const BADGES = [
 
 // Настроение — подписи (картинки придут из assets.js)
 const MOOD_LABELS = [
-  'Плохо', 'Так себе', 'Нейтрально', 'Хорошо', 'Отлично'
+  'Тяжело', 'Так себе', 'Нормально', 'Хорошо', 'Отлично'
+];
+
+/** Одна палитра для кнопок настроения, графика и аналитики */
+const MOOD_COLORS = [
+  '#c62828',
+  '#e65100',
+  '#f9a825',
+  '#2e7d32',
+  '#14532d',
 ];
 
 // Категории привычек

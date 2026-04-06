@@ -669,23 +669,18 @@ body {
   flex: 1;
   aspect-ratio: 1;
   border-radius: 50%;
-  border: 1.5px solid var(--border);
+  border: none;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   cursor: pointer;
-  transition: border-color .15s, background .15s, transform .1s;
-  opacity: 0.4;
+  transition: transform .15s;
+  padding: 2px;
 }
-.mood-btn:hover   { opacity: 0.8; transform: scale(1.08); }
-.mood-btn.selected {
-  opacity: 1;
-  border-color: var(--accent);
-  background: var(--accent-bg);
-  border-width: 2px;
-}
+
+.mood-btn:hover    { transform: scale(1.18); }
+.mood-btn.selected { transform: scale(1.1);  }
 
 /* ── Toast ────────────────────────────────── */
 .toast-wrap {
@@ -744,6 +739,53 @@ body {
   justify-content: flex-end;
   gap: 8px;
   margin-top: 20px;
+}
+
+/* Модалка «Помощь» — шире, текст в теме приложения */
+.guide-modal {
+  width: min(520px, 92vw);
+}
+
+.guide-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.guide-modal-title {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.guide-close {
+  flex-shrink: 0;
+  padding: 6px 12px;
+}
+
+.guide-body h2 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 18px 0 8px;
+  color: var(--accent);
+}
+
+.guide-body h2:first-child {
+  margin-top: 0;
+}
+
+.guide-body p,
+.guide-body li {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+.guide-body ul {
+  padding-left: 20px;
+  margin: 0 0 8px;
 }
 
 /* ── Кнопки ───────────────────────────────── */

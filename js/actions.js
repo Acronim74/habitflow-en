@@ -579,7 +579,7 @@ function _flipBadCard(habitId, state) {
   if (!card) return false;
   const bg   = state === 'clean' ? 'var(--accent)' : 'var(--bad)';
   const ico  = state === 'clean' ? '✓' : '✕';
-  const title = state === 'clean' ? 'Сдержался!' : 'Срыв записан';
+  const title = state === 'clean' ? 'Выдержал!' : 'Срыв записан';
   const h = habits.find(x => x.id === habitId);
   if (!h) return false;
   const streak = calcCleanStreakAt(h, _todayKey());

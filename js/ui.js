@@ -896,6 +896,12 @@ function _renderHmBad() {
     </div>`;
 }
 
+function _moodDotSvg(fill, size = 20) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 22 22" `
+    + `style="display:block;flex-shrink:0" aria-hidden="true">`
+    + `<circle cx="11" cy="11" r="9" fill="${fill}"/></svg>`;
+}
+
 function _renderMoodChart() {
   const wrap  = document.getElementById('moodChartWrap');
   const stats = document.getElementById('moodChartStats');
@@ -909,10 +915,6 @@ function _renderMoodChart() {
     const m = moodLog[dk];
     if (m !== undefined && m !== null) moodData[dk] = m;
   });
-
-  const MOOD_EMOJIS  = ['😞','😐','🙂','😊','🤩'];
-  const MOOD_LABELS  = ['Плохо','Так себе','Нейтрально','Хорошо','Отлично'];
-  const MOOD_COLORS  = ['#e8856a','#f0b070','#aaa','#74c69d','#2d6a4f'];
 
   const recorded = Object.values(moodData);
   const avgMood  = recorded.length > 0
@@ -949,7 +951,7 @@ function _renderMoodChart() {
 
   const yLabels = [4, 2, 0].map(v => ({
     y: PAD_T + chartH - (v / 4) * chartH,
-    emoji: MOOD_EMOJIS[v],
+    color: MOOD_COLORS[v],
   }));
 
   const xStep = Math.max(1, Math.floor(dates.length / 7));
@@ -977,9 +979,9 @@ function _renderMoodChart() {
         <line x1="${PAD_L}" y1="${l.y.toFixed(1)}"
               x2="${W - PAD_R}" y2="${l.y.toFixed(1)}"
               stroke="var(--border)" stroke-width="0.5"/>
-        <text x="${PAD_L - 4}" y="${(l.y + 4).toFixed(1)}"
-              font-size="10" text-anchor="end"
-              fill="var(--text4)">${l.emoji}</text>
+        <circle cx="${PAD_L - 11}" cy="${(l.y + 2).toFixed(1)}"
+                r="5" fill="${l.color}"
+                stroke="var(--surface)" stroke-width="0.75"/>
       `).join('')}
 
       <line x1="${PAD_L}" y1="${PAD_T + chartH}"
@@ -1037,7 +1039,9 @@ function _renderMoodChart() {
        </span>`
     : `
     <div style="display:flex;flex-direction:column;gap:2px">
-      <div style="font-size:16px">${avgMood !== null ? MOOD_EMOJIS[Math.round(avgMood)] : '—'}</div>
+      <div style="display:flex;align-items:center;min-height:22px">
+        ${avgMood !== null ? _moodDotSvg(MOOD_COLORS[Math.round(avgMood)], 22) : '—'}
+      </div>
       <div style="font-size:10px;color:var(--text3)">
         среднее за период
         ${avgMood !== null ? '(' + avgMood.toFixed(1) + '/4)' : ''}
@@ -1049,12 +1053,16 @@ function _renderMoodChart() {
     </div>
     ${best !== null ? `
     <div style="display:flex;flex-direction:column;gap:2px">
-      <div style="font-size:16px">${MOOD_EMOJIS[best]}</div>
+      <div style="display:flex;align-items:center;min-height:22px">
+        ${_moodDotSvg(MOOD_COLORS[best], 22)}
+      </div>
       <div style="font-size:10px;color:var(--text3)">лучший день</div>
     </div>` : ''}
     ${worst !== null && worst !== best ? `
     <div style="display:flex;flex-direction:column;gap:2px">
-      <div style="font-size:16px">${MOOD_EMOJIS[worst]}</div>
+      <div style="display:flex;align-items:center;min-height:22px">
+        ${_moodDotSvg(MOOD_COLORS[worst], 22)}
+      </div>
       <div style="font-size:10px;color:var(--text3)">тяжелый день</div>
     </div>` : ''}`;
 }
@@ -1159,22 +1167,15 @@ function _showBadgeToast(b) {
   setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
 
-// ── Помощь ────────────────────────────────
+// ── Помощь (модалка в приложении — работает на телефоне и планшете) ──
 
 function openGuide() {
-  const guide = `<!DOCTYPE html>
-<html lang="ru"><head><meta charset="UTF-8">
-<title>HabitFlow — Помощь</title>
-<style>
-  body { font-family: -apple-system,sans-serif; max-width:640px;
-         margin:40px auto; padding:0 20px; color:#1a1a1a; }
-  h1 { font-size:22px; margin-bottom:8px; }
-  h2 { font-size:16px; margin:24px 0 8px; color:#2d6a4f; }
-  p  { font-size:14px; line-height:1.7; color:#444; margin-bottom:8px; }
-  ul { padding-left:20px; }
-  li { font-size:14px; line-height:1.7; color:#444; }
-</style></head><body>
-<h1>🌿 HabitFlow — Помощь</h1>
+  const body = document.getElementById('guideBody');
+  const ov   = document.getElementById('guideOverlay');
+  if (!body || !ov) return;
+
+  if (!body.dataset.ready) {
+    body.innerHTML = `
 <h2>Полезные привычки</h2>
 <p>Нажми на кнопку справа от карточки чтобы отметить выполнение.
 Кнопка переедет на левую сторону — это знак что дело сделано.</p>
@@ -1190,10 +1191,17 @@ function openGuide() {
   <li>Вредная привычка (чистый день): +5 pts</li>
   <li>Все привычки за день: +25 pts</li>
   <li>Стрик 7+ дней: ×2; 30+ дней: ×3; 100+ дней: ×5</li>
-</ul>
-</body></html>`;
-  const blob = new Blob([guide], { type: 'text/html' });
-  window.open(URL.createObjectURL(blob), '_blank');
+</ul>`;
+    body.dataset.ready = '1';
+  }
+
+  ov.classList.add('open');
+}
+
+function closeGuide(e) {
+  if (e && e.target !== document.getElementById('guideOverlay')) return;
+  const ov = document.getElementById('guideOverlay');
+  if (ov) ov.classList.remove('open');
 }
 
 // ── Инициализация ─────────────────────────

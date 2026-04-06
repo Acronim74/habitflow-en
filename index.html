@@ -348,6 +348,17 @@
        id="slipModal"></div>
 </div>
 
+<div class="overlay" id="guideOverlay" onclick="closeGuide(event)">
+  <div class="modal guide-modal" onclick="event.stopPropagation()">
+    <div class="guide-modal-head">
+      <div class="modal-title guide-modal-title">🌿 HabitFlow — Помощь</div>
+      <button type="button" class="btn btn-ghost guide-close"
+              onclick="closeGuide()">Закрыть</button>
+    </div>
+    <div class="guide-body" id="guideBody"></div>
+  </div>
+</div>
+
 <!-- ════════════ ТОСТЫ ════════════ -->
 <div class="toast-wrap" id="toastWrap"></div>
 
