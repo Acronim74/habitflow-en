@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -98,6 +98,21 @@
               onclick="triggerImport()">📂</button>
       <button class="nav-action" type="button" title="Помощь"
               onclick="openGuide()">❓</button>
+      <!-- Переключатель тем -->
+      <div class="theme-switcher" id="themeSwitcher">
+        <button type="button" class="theme-btn active"
+                data-theme="light" onclick="setTheme('light')"
+                title="Светлая">☀️</button>
+        <button type="button" class="theme-btn"
+                data-theme="dark" onclick="setTheme('dark')"
+                title="Тёмная">🌙</button>
+        <button type="button" class="theme-btn"
+                data-theme="tron" onclick="setTheme('tron')"
+                title="Трон">◈</button>
+        <button type="button" class="theme-btn"
+                data-theme="blade" onclick="setTheme('blade')"
+                title="Blade Runner">◉</button>
+      </div>
       <button class="nav-avatar" type="button" onclick="navigate('badges')">
         <div class="nav-av-pic" id="navAvPic">🌱</div>
         <span class="nav-av-text" id="navAvText">Искатель · 0 pts</span>
@@ -169,7 +184,7 @@
               <span style="font-size:12px;color:var(--text3)"> дней</span>
             </div>
           </div>
-          <div style="font-size:11px;color:#e8720a;text-align:right"
+          <div style="font-size:11px;color:var(--streak-color);text-align:right"
                id="streakName"></div>
         </div>
 

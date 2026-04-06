@@ -350,7 +350,7 @@ function _renderHmGood() {
     if (pct < 0.4)    return 'var(--accent3)';
     if (pct < 0.7)    return 'var(--accent2)';
     if (pct < 1)      return 'var(--accent)';
-    return '#1a4d38';
+    return 'var(--hm-lv4)';
   }
 
   if (_analyticsPeriod === 'week') {
@@ -522,7 +522,7 @@ function _renderHmGood() {
           <div style="width:10px;height:10px;border-radius:2px;background:var(--accent3)"></div>
           <div style="width:10px;height:10px;border-radius:2px;background:var(--accent2)"></div>
           <div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>
-          <div style="width:10px;height:10px;border-radius:2px;background:#1a4d38"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:var(--hm-lv4)"></div>
           <span style="font-size:10px;color:var(--text4);margin-left:2px">меньше → больше</span>
         </div>`;
     } else {
@@ -584,7 +584,7 @@ function _renderHmGood() {
         <div style="width:10px;height:10px;border-radius:2px;background:var(--accent3)"></div>
         <div style="width:10px;height:10px;border-radius:2px;background:var(--accent2)"></div>
         <div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>
-        <div style="width:10px;height:10px;border-radius:2px;background:#1a4d38"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:var(--hm-lv4)"></div>
         <span style="font-size:10px;color:var(--text4);margin-left:2px">меньше → больше</span>
       </div>`;
     wrap.innerHTML = html;
@@ -1198,15 +1198,31 @@ function openGuide() {
 
 // ── Инициализация ─────────────────────────
 
+function setTheme(theme, save = true) {
+  const allowed = new Set(['light', 'dark', 'tron', 'blade']);
+  const t = allowed.has(theme) ? theme : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === t);
+  });
+
+  if (save) {
+    localStorage.setItem('habitflow_theme', t);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadData();
 
-  // Показываем онбординг только при первом запуске
   const isFirstRun = !localStorage.getItem(LS_KEY);
   const onboarding = document.getElementById('onboardingScreen');
   if (onboarding) {
     onboarding.style.display = isFirstRun ? 'flex' : 'none';
   }
+
+  const savedTheme = localStorage.getItem('habitflow_theme') || 'light';
+  setTheme(savedTheme, false);
 
   navigate('today');
   renderNav();

@@ -28,12 +28,12 @@ function _drawGauge(pct) {
   if (barFill) {
     barFill.style.width = Math.max(0, Math.min(120, val)) + '%';
     barFill.style.background =
-      val > 100 ? 'linear-gradient(90deg, var(--accent) 0%, #1a4d38 100%)' : 'var(--accent)';
+      val > 100 ? 'linear-gradient(90deg, var(--accent) 0%, var(--hm-lv4) 100%)' : 'var(--accent)';
   }
   const pctEl = document.getElementById('gaugePct');
   if (pctEl) {
     pctEl.textContent = val + '%';
-    pctEl.style.color = val >= 100 ? '#1a4d38' : 'var(--text1)';
+    pctEl.style.color = val >= 100 ? 'var(--hm-lv4)' : 'var(--text1)';
   }
   const lblEl = document.getElementById('gaugeLbl');
   if (lblEl) {

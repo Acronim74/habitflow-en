@@ -2,8 +2,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f2f2ed;
-  color: #1a1a1a;
+  background: var(--bg);
+  color: var(--text1);
   font-size: 14px;
   line-height: 1.5;
   min-height: 100vh;
@@ -37,6 +37,9 @@ body {
   --r-sm: 8px;
   --r-md: 11px;
   --r-lg: 14px;
+
+  --streak-color: #e8720a;
+  --hm-lv4:       #1a4d38;
 }
 
 /* ── Лэйаут приложения ────────────────────── */
@@ -320,7 +323,7 @@ body {
   text-overflow: ellipsis;
 }
 .hcard-sub { font-size: 11px; color: var(--text3); padding-left: 25px; }
-.hcard-sub.hs-streak { color: #e8720a; }
+.hcard-sub.hs-streak { color: var(--streak-color); }
 .hcard-sub.hs-bonus  { color: var(--bonus); }
 
 /* Правая зона — кнопка чека */
@@ -600,7 +603,7 @@ body {
 .hm-cell.lv1 { background: var(--accent3); }
 .hm-cell.lv2 { background: var(--accent2); }
 .hm-cell.lv3 { background: var(--accent);  }
-.hm-cell.lv4 { background: #1a4d38; }
+.hm-cell.lv4 { background: var(--hm-lv4); }
 .hm-cell.today { outline: 1.5px solid var(--accent); outline-offset: 1px; }
 
 /* ── XP прогресс ──────────────────────────── */
@@ -1201,4 +1204,169 @@ body {
   #screenAnalytics #hmBadWrap > div {
     min-width: max-content;
   }
+}
+
+/* ══════════════════════════════════════
+   ТЁМНАЯ ТЕМА
+   ══════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg:          #141414;
+  --surface:     #1e1e1e;
+  --border:      #2a2a2a;
+  --border2:     #383838;
+
+  --accent:      #52b788;
+  --accent2:     #2d6a4f;
+  --accent3:     #1a3d28;
+  --accent-bg:   #162b1e;
+
+  --bad:         #e8856a;
+  --bad-light:   #7a3020;
+  --bad-bg:      #2a1810;
+
+  --bonus:       #f0cc6a;
+  --bonus-light: #7a5a10;
+  --bonus-bg:    #2a2010;
+
+  --text1: #e8e8e0;
+  --text2: #aaaaaa;
+  --text3: #666666;
+  --text4: #444444;
+
+  --streak-color: #e8a050;
+  --hm-lv4:       #52b788;
+}
+
+/* ══════════════════════════════════════
+   ТРОН
+   ══════════════════════════════════════ */
+[data-theme="tron"] {
+  --bg:          #020c18;
+  --surface:     #041220;
+  --border:      #00c8ff18;
+  --border2:     #00c8ff33;
+
+  --accent:      #00c8ff;
+  --accent2:     #0080aa;
+  --accent3:     #003344;
+  --accent-bg:   #001822;
+
+  --bad:         #ff4466;
+  --bad-light:   #661828;
+  --bad-bg:      #220810;
+
+  --bonus:       #00c8ff;
+  --bonus-light: #005566;
+  --bonus-bg:    #001822;
+
+  --text1: #c8eeff;
+  --text2: #88bbcc;
+  --text3: #00c8ff66;
+  --text4: #00c8ff33;
+
+  --streak-color: #00c8ff;
+  --hm-lv4:       #00c8ff;
+}
+
+/* Трон: шрифт навбара */
+[data-theme="tron"] .nav-brand-name {
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+[data-theme="tron"] .nav-tab {
+  letter-spacing: 1px;
+  font-size: 11px;
+}
+[data-theme="tron"] .nav-tab.active {
+  box-shadow: 0 0 12px #00c8ff44;
+}
+[data-theme="tron"] .hcard.hc-active,
+[data-theme="tron"] .hcard.hc-done {
+  box-shadow: 0 0 10px #00c8ff22;
+}
+[data-theme="tron"] .hm-cell.lv3 {
+  box-shadow: 0 0 4px #00c8ff;
+}
+[data-theme="tron"] .hm-cell.lv4 {
+  box-shadow: 0 0 6px #00c8ff;
+}
+
+/* ══════════════════════════════════════
+   BLADE RUNNER
+   ══════════════════════════════════════ */
+[data-theme="blade"] {
+  --bg:          #0d0a06;
+  --surface:     #100c07;
+  --border:      #c87a2218;
+  --border2:     #c87a2233;
+
+  --accent:      #c87a22;
+  --accent2:     #7a4a10;
+  --accent3:     #3a2008;
+  --accent-bg:   #221408;
+
+  --bad:         #cc4422;
+  --bad-light:   #661810;
+  --bad-bg:      #220a06;
+
+  --bonus:       #c87a22;
+  --bonus-light: #7a4a10;
+  --bonus-bg:    #221408;
+
+  --text1: #d4b896;
+  --text2: #a07850;
+  --text3: #c87a2266;
+  --text4: #c87a2233;
+
+  --streak-color: #e8a050;
+  --hm-lv4:       #c87a22;
+}
+
+[data-theme="blade"] .nav-tab.active {
+  box-shadow: 0 0 12px #c87a2244;
+}
+[data-theme="blade"] .hcard.hc-active {
+  box-shadow: 0 0 12px #c87a2233;
+}
+[data-theme="blade"] .hm-cell.lv3 {
+  box-shadow: 0 0 4px #c87a2288;
+}
+[data-theme="blade"] .hm-cell.lv4 {
+  box-shadow: 0 0 6px #c87a22;
+}
+
+/* ── Переключатель тем ────────────────────── */
+.theme-switcher {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 20px;
+  padding: 3px;
+}
+
+.theme-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  background: transparent;
+  transition: background .15s;
+  line-height: 1;
+}
+
+.theme-btn.active {
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+}
+
+.theme-btn:hover:not(.active) {
+  background: var(--border);
 }
