@@ -387,7 +387,9 @@ body {
   position: relative;
   cursor: default;
   user-select: none;
-  transition: border-color .2s, transform .1s;
+  transform-style: preserve-3d;
+  transition: transform .45s cubic-bezier(.4,0,.2,1), border-color .2s;
+  min-height: 68px;
 }
 .bcard:active   { transform: scale(0.99); }
 .bcard.bc-clean   { border-color: var(--accent2); }

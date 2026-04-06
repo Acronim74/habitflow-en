@@ -577,7 +577,7 @@ function importData(event) {
 function _flipBadCard(habitId, state) {
   const card = document.getElementById('bcard-' + habitId);
   if (!card) return false;
-  const bg   = state === 'clean' ? 'var(--accent)' : 'var(--bad-light)';
+  const bg   = state === 'clean' ? 'var(--accent)' : 'var(--bad)';
   const ico  = state === 'clean' ? '✓' : '✕';
   const title = state === 'clean' ? 'Сдержался!' : 'Срыв записан';
   const h = habits.find(x => x.id === habitId);

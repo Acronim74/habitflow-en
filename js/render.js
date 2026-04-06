@@ -1,51 +1,4 @@
-// ── Спидометр ──────────────────────────────
-
-const _GAUGE_CX = 100, _GAUGE_CY = 105;
-const _GAUGE_R_OUT = 78, _GAUGE_R_IN = 58;
-const _GAUGE_SEGS = 7;
-const _GAUGE_GAP  = 3;
-const _GAUGE_ARC  = (180 - _GAUGE_GAP * (_GAUGE_SEGS - 1)) / _GAUGE_SEGS;
-
-function _gaugePt(r, deg) {
-  const rad = deg * Math.PI / 180;
-  return [
-    _GAUGE_CX + r * Math.cos(rad),
-    _GAUGE_CY - r * Math.sin(rad),
-  ];
-}
-
-function _gaugeSegPath(startDeg, endDeg) {
-  const [x1, y1] = _gaugePt(_GAUGE_R_OUT, startDeg);
-  const [x2, y2] = _gaugePt(_GAUGE_R_OUT, endDeg);
-  const [x3, y3] = _gaugePt(_GAUGE_R_IN,  endDeg);
-  const [x4, y4] = _gaugePt(_GAUGE_R_IN,  startDeg);
-  return `M${x1.toFixed(2)} ${y1.toFixed(2)}
-          A${_GAUGE_R_OUT} ${_GAUGE_R_OUT} 0 0 0 ${x2.toFixed(2)} ${y2.toFixed(2)}
-          L${x3.toFixed(2)} ${y3.toFixed(2)}
-          A${_GAUGE_R_IN} ${_GAUGE_R_IN} 0 0 1 ${x4.toFixed(2)} ${y4.toFixed(2)}Z`;
-}
-
-function _renderGaugeSegments(pct) {
-  const container = document.getElementById('gaugeSegments');
-  if (!container) return;
-  container.innerHTML = '';
-  const activeCount = Math.round(pct / 100 * _GAUGE_SEGS);
-  for (let i = 0; i < _GAUGE_SEGS; i++) {
-    const segStart = 180 - i * (_GAUGE_ARC + _GAUGE_GAP);
-    const segEnd   = segStart - _GAUGE_ARC;
-    const isActive = i < activeCount;
-    const fill = isActive
-      ? (i < 2 ? 'var(--accent3)'
-       : i < 4 ? 'var(--accent2)'
-       : i < 6 ? 'var(--accent)'
-       :          '#1a4d38')
-      : 'var(--border2)';
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', _gaugeSegPath(segStart, segEnd));
-    path.setAttribute('fill', fill);
-    container.appendChild(path);
-  }
-}
+// ── Прогресс дня (горизонтальный) ──────────
 
 let _gaugeCurrentPct = 0;
 let _gaugeTargetPct  = 0;
@@ -70,26 +23,22 @@ function _gaugeStep() {
 }
 
 function _drawGauge(pct) {
-  // Стрелка: -90° = 0%, 0° = 50%, +90° = 100%
-  const rot = -90 + pct * 1.8;
-  const needle = document.getElementById('gaugeNeedle');
-  if (needle) {
-    needle.setAttribute('transform',
-      `rotate(${rot.toFixed(1)} ${_GAUGE_CX} ${_GAUGE_CY})`);
-  }
-  // Текст
   const val = Math.round(pct);
+  const barFill = document.getElementById('gaugeBarFill');
+  if (barFill) {
+    barFill.style.width = Math.max(0, Math.min(120, val)) + '%';
+    barFill.style.background =
+      val > 100 ? 'linear-gradient(90deg, var(--accent) 0%, #1a4d38 100%)' : 'var(--accent)';
+  }
   const pctEl = document.getElementById('gaugePct');
   if (pctEl) {
     pctEl.textContent = val + '%';
-    pctEl.setAttribute('fill', val >= 100 ? '#1a4d38' : 'var(--text1)');
+    pctEl.style.color = val >= 100 ? '#1a4d38' : 'var(--text1)';
   }
   const lblEl = document.getElementById('gaugeLbl');
   if (lblEl) {
-    lblEl.textContent = val >= 100 ? 'отлично!' : 'выполнено';
+    lblEl.textContent = val > 100 ? 'с бонусами' : 'выполнено';
   }
-  // Сегменты
-  _renderGaugeSegments(pct);
 }
 
 // ── Навбар (аватар и pts) ──────────────────
@@ -133,10 +82,15 @@ function _renderTodayChrome() {
   const schedTotal = scheduled.length || 1;
   const done  = scheduled.filter(h => h.checks?.[tk]).length;
   const bonusDone = bonuses.filter(h => h.checks?.[tk]).length;
-  const basePct  = Math.round(done / schedTotal * 100);
-  const displayPct = Math.min(100, basePct);
+  const basePct   = Math.round(done / schedTotal * 100);
+  const bonusPct  = bonuses.length > 0
+    ? Math.round(bonusDone / bonuses.length * 100)
+    : 0;
+  // Бонусные добавляют до 20% поверх 100%
+  const displayPct = Math.min(120, basePct + Math.round(bonusPct * 0.2));
   document.getElementById('donutMeta').textContent =
-    done + ' из ' + scheduled.length + ' привычек';
+    done + ' из ' + scheduled.length +
+    (bonusDone > 0 ? ' +' + bonusDone + ' бонус' : '') + ' привычек';
   _animateGauge(displayPct);
 
   let bestS = 0, bestName = '';
@@ -188,10 +142,14 @@ function _renderTodayChromeForFlip() {
   const schedTotal = scheduled.length || 1;
   const done  = scheduled.filter(h => h.checks?.[tk]).length;
   const bonusDone = bonuses.filter(h => h.checks?.[tk]).length;
-  const basePct  = Math.round(done / schedTotal * 100);
-  const displayPct = Math.min(100, basePct);
+  const basePct   = Math.round(done / schedTotal * 100);
+  const bonusPct  = bonuses.length > 0
+    ? Math.round(bonusDone / bonuses.length * 100)
+    : 0;
+  const displayPct = Math.min(120, basePct + Math.round(bonusPct * 0.2));
   document.getElementById('donutMeta').textContent =
-    done + ' из ' + scheduled.length + ' привычек';
+    done + ' из ' + scheduled.length +
+    (bonusDone > 0 ? ' +' + bonusDone + ' бонус' : '') + ' привычек';
 
   if (_gaugeRafId) cancelAnimationFrame(_gaugeRafId);
   _gaugeRafId = null;
@@ -481,7 +439,7 @@ function _buildBCard(h, tk) {
                : 'bcard-sub';
 
   // Обратная сторона зависит от действия
-  const backBg    = isClean ? 'var(--accent)' : 'var(--bad-light)';
+  const backBg    = isClean ? 'var(--accent)' : 'var(--bad)';
   const backIco   = isClean ? '✓' : '✕';
   const backTitle = isClean ? 'Сдержался!' : 'Срыв записан';
   const backSub   = isClean
@@ -493,10 +451,7 @@ function _buildBCard(h, tk) {
   wrap.innerHTML = `
     <div class="bcard${state !== 'neutral' ? ' bc-flipped' : ''}"
          id="bcard-${h.id}"
-         style="min-height:68px;position:relative;
-                transform-style:preserve-3d;
-                transition:transform .45s cubic-bezier(.4,0,.2,1);
-                transform:${state !== 'neutral' ? 'rotateY(180deg)' : 'rotateY(0deg)'}">
+         style="transform:${state !== 'neutral' ? 'rotateY(180deg)' : 'rotateY(0deg)'}">
 
       <!-- Лицевая сторона -->
       <div data-face="front" style="position:absolute;inset:0;

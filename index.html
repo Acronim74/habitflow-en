@@ -143,28 +143,16 @@
 
         <div class="panel-title" id="todayDate">Загрузка...</div>
 
-        <!-- Спидометр -->
+        <!-- Горизонтальный прогресс -->
         <div style="text-align:center">
-          <svg id="gaugeSvg" viewBox="0 0 200 120"
-               style="width:100%;max-width:180px;height:auto;display:block;margin:0 auto">
-            <g id="gaugeSegments"></g>
-            <g id="gaugeNeedle" transform="rotate(-90 100 105)">
-              <line x1="100" y1="105" x2="100" y2="118"
-                    stroke="var(--accent)" stroke-width="2.5"
-                    stroke-linecap="round"/>
-              <line x1="100" y1="105" x2="100" y2="22"
-                    stroke="var(--text1)" stroke-width="2.5"
-                    stroke-linecap="round"/>
-              <circle cx="100" cy="105" r="5" fill="var(--text1)"/>
-              <circle cx="100" cy="105" r="2.5" fill="var(--surface)"/>
-            </g>
-            <text id="gaugePct" x="100" y="96" text-anchor="middle"
-                  font-size="22" font-weight="500"
-                  fill="var(--text1)" font-family="inherit">0%</text>
-            <text id="gaugeLbl" x="100" y="110" text-anchor="middle"
-                  font-size="9" fill="var(--text3)"
-                  font-family="inherit">выполнено</text>
-          </svg>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+            <div id="gaugePct" style="font-size:22px;font-weight:500;color:var(--text1)">0%</div>
+            <div id="gaugeLbl" style="font-size:10px;color:var(--text3)">выполнено</div>
+          </div>
+          <div style="height:10px;background:var(--border);border-radius:999px;overflow:hidden">
+            <div id="gaugeBarFill"
+                 style="height:100%;width:0%;background:var(--accent);transition:width .35s ease"></div>
+          </div>
           <div class="donut-meta" id="donutMeta">0 из 0</div>
         </div>
 
