@@ -380,20 +380,20 @@ body {
 
 /* ── Карточка вредной привычки ────────────── */
 .bcard {
-  background: var(--surface);
-  border: 0.5px solid var(--border);
+  background: transparent;
+  border: none;
   border-radius: var(--r-lg);
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   cursor: default;
   user-select: none;
   transform-style: preserve-3d;
-  transition: transform .45s cubic-bezier(.4,0,.2,1), border-color .2s;
+  transition: transform 3s cubic-bezier(0.45, 0, 0.55, 1);
   min-height: 68px;
 }
 .bcard:active   { transform: scale(0.99); }
 .bcard.bc-clean   { border-color: var(--accent2); }
-.bcard.bc-slipped { border-color: var(--bad-light); }
+.bcard.bc-slipped { border-color: var(--bad); }
 
 .bcard-row {
   display: flex;
@@ -845,6 +845,17 @@ body {
   transform: rotateY(180deg);
 }
 
+/* Вредная карточка в том же wrap — не даём :active ломать 3D-поворот */
+.hcard-flip-wrap .bcard {
+  overflow: visible;
+}
+.hcard-flip-wrap .bcard:active {
+  transform: none;
+}
+.hcard-flip-wrap .bcard.bc-flipped:active {
+  transform: rotateY(180deg);
+}
+
 /* На флип-карточке не показываем «выезд» зелёной полосы слева — только переворот */
 .hcard-flip-wrap .hcard .hcard-done-zone {
   width: 0 !important;
@@ -979,8 +990,9 @@ body {
    ════════════════════════════ */
 @media (max-width: 900px) {
 
-  /* Навигация: скрываем только вкладки */
-  .nav-tabs { display: none; }
+  /* Навигация: вкладки компактные, не скрываем */
+  .nav-tabs { display: flex; flex-wrap: wrap; gap: 2px; }
+  .nav-tab  { padding: 5px 12px; font-size: 12px; }
 
   /* На узкой ширине прячем подпись аватара, чтобы влезли action-иконки */
   .nav-av-text { display: none; }

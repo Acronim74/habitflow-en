@@ -455,13 +455,14 @@ function _buildBCard(h, tk) {
 
       <!-- Лицевая сторона -->
       <div data-face="front" style="position:absolute;inset:0;
-                  backface-visibility:hidden;
-                  -webkit-backface-visibility:hidden;
-                  background:var(--surface);
-                  border-radius:var(--r-lg);
-                  overflow:hidden;
-                  display:flex;flex-direction:column;
-                  border:0.5px solid ${isClean ? 'var(--accent2)' : isSlipped ? 'var(--bad-light)' : 'var(--border)'}">
+            box-sizing:border-box;
+            backface-visibility:hidden;
+            -webkit-backface-visibility:hidden;
+            background:var(--surface);
+            overflow:hidden;
+            display:flex;flex-direction:column;
+            border:0.5px solid ${isClean ? 'var(--accent2)' : isSlipped ? 'var(--bad)' : 'var(--border)'};
+            border-radius:var(--r-lg)">
         <div class="bcard-row">
           <div class="bcard-result-zone"
                onclick="event.stopPropagation();resetBadCard('${h.id}')">
