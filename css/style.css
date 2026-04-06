@@ -1358,15 +1358,22 @@ body {
   justify-content: center;
   font-size: 13px;
   background: transparent;
-  transition: background .15s;
+  transition: background .15s, opacity .15s;
   line-height: 1;
+  opacity: 0.5;
+  color: inherit;
 }
 
 .theme-btn.active {
-  background: var(--surface);
-  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  opacity: 1;
 }
 
 .theme-btn:hover:not(.active) {
-  background: var(--border);
+  opacity: 0.8;
 }
+
+/* Фиксированные цвета — не зависят от темы */
+.theme-btn[data-theme="light"]  { color: #e8a020; }
+.theme-btn[data-theme="dark"]   { color: #aaaaaa; }
+.theme-btn[data-theme="tron"]   { color: #00c8ff; }
+.theme-btn[data-theme="blade"]  { color: #c87a22; }
