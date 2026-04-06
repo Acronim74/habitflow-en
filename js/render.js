@@ -305,22 +305,18 @@ function _patchAllGoodHCards(tk) {
 }
 
 function _reorderGoodListIfNeeded(tk) {
+  // Карточки остаются на своих местах — не перемещаем после флипа
   const list = document.getElementById('goodList');
   if (!list) return false;
   const good = habits.filter(h => !h.bad);
   const scheduled = good.filter(h => _isWorkDay(h, tk));
-  const sorted = _sortHabits(scheduled);
-  if (sorted.length !== list.children.length) return false;
-  for (let i = 0; i < sorted.length; i++) {
-    const inner = document.getElementById('hcard-' + sorted[i].id);
+  // Проверяем только что все карточки есть в DOM
+  for (const h of scheduled) {
+    const inner = document.getElementById('hcard-' + h.id);
     if (!inner) return false;
     const wrap = inner.closest('.hcard-flip-wrap');
     if (!wrap || wrap.parentNode !== list) return false;
   }
-  sorted.forEach(h => {
-    const wrap = document.getElementById('hcard-' + h.id).closest('.hcard-flip-wrap');
-    list.appendChild(wrap);
-  });
   return true;
 }
 
@@ -332,16 +328,12 @@ function _reorderBonusListIfNeeded(tk) {
     return !bonusList || bonusList.children.length === 0;
   }
   if (!bonusList || bonuses.length !== bonusList.children.length) return false;
-  for (let i = 0; i < bonuses.length; i++) {
-    const inner = document.getElementById('hcard-' + bonuses[i].id);
+  for (const h of bonuses) {
+    const inner = document.getElementById('hcard-' + h.id);
     if (!inner) return false;
     const wrap = inner.closest('.hcard-flip-wrap');
     if (!wrap || wrap.parentNode !== bonusList) return false;
   }
-  bonuses.forEach(h => {
-    const wrap = document.getElementById('hcard-' + h.id).closest('.hcard-flip-wrap');
-    bonusList.appendChild(wrap);
-  });
   return true;
 }
 
@@ -474,62 +466,110 @@ function _buildBCard(h, tk) {
   const isSlipped = !!h.slips?.[tk];
   const streak    = calcCleanStreakAt(h, tk);
 
-  let cls = 'bcard';
-  if (isClean)   cls += ' bc-clean';
-  if (isSlipped) cls += ' bc-slipped';
+  // Состояние карточки
+  let state = 'neutral';
+  if (isClean)   state = 'clean';
+  if (isSlipped) state = 'slipped';
 
-  const leftIco = isClean ? '✓' : isSlipped ? '✕' : '';
-  const leftLbl = isClean ? 'чисто' : isSlipped ? 'срыв' : '';
-  let subText = isClean
+  const subText = isClean
     ? `${streak} чистых дней подряд`
     : isSlipped
     ? 'Стрик сброшен · завтра новый шанс'
     : `${streak} чист. дн. · отметь сегодня`;
-  const subCls = isClean ? 'bcard-sub bs-ok'
+  const subCls = isClean   ? 'bcard-sub bs-ok'
                : isSlipped ? 'bcard-sub bs-bad'
                : 'bcard-sub';
 
-  const div = document.createElement('div');
-  div.className = cls;
-  div.id = 'bcard-' + h.id;
-  div.innerHTML = `
-    <div class="bcard-row">
-      <div class="bcard-result-zone"
-           onclick="event.stopPropagation();resetBadCard('${h.id}')">
-        <div class="bcard-result-ico">${leftIco}</div>
-        <div class="bcard-result-lbl">${leftLbl}</div>
-      </div>
-      <div class="bcard-body">
-        <div class="bcard-top">
-          <span class="bcard-ico">${h.icon || '🚫'}</span>
-          <span class="bcard-name">${esc(h.name)}</span>
+  // Обратная сторона зависит от действия
+  const backBg    = isClean ? 'var(--accent)' : 'var(--bad-light)';
+  const backIco   = isClean ? '✓' : '✕';
+  const backTitle = isClean ? 'Сдержался!' : 'Срыв записан';
+  const backSub   = isClean
+    ? streak + ' чистых дней'
+    : 'Завтра новый шанс';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'hcard-flip-wrap';
+  wrap.innerHTML = `
+    <div class="bcard${state !== 'neutral' ? ' bc-flipped' : ''}"
+         id="bcard-${h.id}"
+         style="min-height:68px;position:relative;
+                transform-style:preserve-3d;
+                transition:transform .45s cubic-bezier(.4,0,.2,1);
+                transform:${state !== 'neutral' ? 'rotateY(180deg)' : 'rotateY(0deg)'}">
+
+      <!-- Лицевая сторона -->
+      <div data-face="front" style="position:absolute;inset:0;
+                  backface-visibility:hidden;
+                  -webkit-backface-visibility:hidden;
+                  background:var(--surface);
+                  border-radius:var(--r-lg);
+                  overflow:hidden;
+                  display:flex;flex-direction:column;
+                  border:0.5px solid ${isClean ? 'var(--accent2)' : isSlipped ? 'var(--bad-light)' : 'var(--border)'}">
+        <div class="bcard-row">
+          <div class="bcard-result-zone"
+               onclick="event.stopPropagation();resetBadCard('${h.id}')">
+            <div class="bcard-result-ico"></div>
+            <div class="bcard-result-lbl"></div>
+          </div>
+          <div class="bcard-body">
+            <div class="bcard-top">
+              <span class="bcard-ico">${h.icon || '🚫'}</span>
+              <span class="bcard-name">${esc(h.name)}</span>
+            </div>
+            <div class="${subCls}">${esc(subText)}</div>
+          </div>
+          <div class="bcard-btns">
+            <button type="button" class="btn-green"
+                    onclick="event.stopPropagation();markBadClean('${h.id}')"
+                    title="Выдержал">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2.5 7L5.5 10L11.5 4" stroke="var(--accent)"
+                  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button type="button" class="btn-red"
+                    onclick="event.stopPropagation();openSlip('${h.id}')"
+                    title="Был срыв">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M4 4L10 10M10 4L4 10" stroke="var(--bad)"
+                  stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div class="${subCls}">${esc(subText)}</div>
+        <div class="bcard-bar-track"><div class="bcard-bar"></div></div>
       </div>
-      <div class="bcard-btns">
-        <button type="button" class="btn-green"
-                onclick="event.stopPropagation();markBadClean('${h.id}')"
-                title="Выдержал">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M2.5 7L5.5 10L11.5 4" stroke="var(--accent)"
-              stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button type="button" class="btn-red"
-                onclick="event.stopPropagation();openSlip('${h.id}')"
-                title="Был срыв">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M4 4L10 10M10 4L4 10" stroke="var(--bad)"
-              stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
+
+      <!-- Обратная сторона -->
+      <div data-face="back" style="position:absolute;inset:0;
+                  backface-visibility:hidden;
+                  -webkit-backface-visibility:hidden;
+                  transform:rotateY(180deg);
+                  background:${backBg};
+                  border-radius:var(--r-lg);
+                  display:flex;align-items:center;
+                  justify-content:center;gap:12px;padding:0 16px">
+        <div data-role="back-ico" style="font-size:22px;color:white;flex-shrink:0">${backIco}</div>
+        <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+          <div data-role="back-title" style="font-size:13px;font-weight:500;color:white">${backTitle}</div>
+          <div data-role="back-sub" style="font-size:11px;color:rgba(255,255,255,.65)">${backSub}</div>
+        </div>
+        <button type="button"
+                onclick="event.stopPropagation();resetBadCard('${h.id}')"
+                style="font-size:11px;color:rgba(255,255,255,.5);
+                       cursor:pointer;padding:4px 10px;
+                       border:0.5px solid rgba(255,255,255,.25);
+                       border-radius:var(--r-md);background:transparent;
+                       white-space:nowrap;flex-shrink:0">
+          отменить
         </button>
       </div>
-    </div>
-    <div class="bcard-bar-track">
-      <div class="bcard-bar"></div>
+
     </div>`;
-  return div;
+
+  return wrap;
 }
 
 // ── Прогресс-полоса вредных ────────────────

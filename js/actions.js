@@ -94,8 +94,12 @@ function markBadClean(habitId) {
   cleanTodaySet.add(habitId);
   delete h.slips[_todayKey()];
   saveData();
-  renderToday();
-  showToast('✓ ' + h.name + ' — сдержался сегодня!');
+  if (!_flipBadCard(habitId, 'clean')) {
+    renderToday();
+  }
+  _renderTodayChromeForFlip();
+  renderNav();
+  showToast('✓ ' + h.name + ' — сдержался!');
 }
 
 function resetBadCard(habitId) {
@@ -105,7 +109,11 @@ function resetBadCard(habitId) {
   cleanTodaySet.delete(habitId);
   delete h.slips[_todayKey()];
   saveData();
-  renderToday();
+  if (!_unflipBadCard(habitId)) {
+    renderToday();
+  }
+  _renderTodayChromeForFlip();
+  renderNav();
 }
 
 // ── Срыв вредной привычки ─────────────────
@@ -150,9 +158,12 @@ function confirmSlip(habitId) {
 
   saveData();
   closeSlip();
-  renderToday();
-  checkBadges();
+  if (!_flipBadCard(habitId, 'slipped')) {
+    renderToday();
+  }
+  _renderTodayChromeForFlip();
   renderNav();
+  checkBadges();
   showToast('Срыв записан · завтра новый шанс');
 }
 
@@ -559,4 +570,45 @@ function importData(event) {
   };
 
   reader.readAsText(file);
+}
+
+// ── Флип вредных карточек ──────────────────
+
+function _flipBadCard(habitId, state) {
+  const card = document.getElementById('bcard-' + habitId);
+  if (!card) return false;
+  const bg   = state === 'clean' ? 'var(--accent)' : 'var(--bad-light)';
+  const ico  = state === 'clean' ? '✓' : '✕';
+  const title = state === 'clean' ? 'Сдержался!' : 'Срыв записан';
+  const h = habits.find(x => x.id === habitId);
+  if (!h) return false;
+  const streak = calcCleanStreakAt(h, _todayKey());
+  const sub   = state === 'clean'
+    ? streak + ' чистых дней'
+    : 'Завтра новый шанс';
+  // Обновляем обратную сторону
+  const back = card.querySelector('[data-face="back"]');
+  if (back) {
+    back.style.background = bg;
+    const icoEl = back.querySelector('[data-role="back-ico"]');
+    const titleEl = back.querySelector('[data-role="back-title"]');
+    const subEl = back.querySelector('[data-role="back-sub"]');
+    if (icoEl) icoEl.textContent = ico;
+    if (titleEl) titleEl.textContent = title;
+    if (subEl) subEl.textContent = sub;
+  }
+  // Флипаем
+  requestAnimationFrame(() => {
+    card.style.transform = 'rotateY(180deg)';
+  });
+  return true;
+}
+
+function _unflipBadCard(habitId) {
+  const card = document.getElementById('bcard-' + habitId);
+  if (!card) return false;
+  requestAnimationFrame(() => {
+    card.style.transform = 'rotateY(0deg)';
+  });
+  return true;
 }
