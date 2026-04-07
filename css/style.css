@@ -1185,7 +1185,17 @@ body {
 
   /* Топнавбар: бренд + action-иконки */
   .nav-tabs  { display: none; }
-  .topnav    { padding: 0 16px; justify-content: space-between; }
+  .topnav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 120;
+    padding: 0 16px;
+    justify-content: space-between;
+    transform: translateZ(0);
+  }
 
   /* На телефоне оставляем только action-иконки, аватар скрываем */
   .nav-right { display: flex; gap: 4px; }
@@ -1199,14 +1209,15 @@ body {
   .bottom-nav {
     display: flex;
     position: fixed;
-    bottom: 0;
+    bottom: env(safe-area-inset-bottom, 0);
     left: 0;
     right: 0;
     height: 60px;
     background: var(--surface);
     border-top: 0.5px solid var(--border);
-    z-index: 100;
+    z-index: 120;
     align-items: stretch;
+    transform: translateZ(0);
   }
 
   .bottom-nav-item {
@@ -1239,8 +1250,11 @@ body {
     font-weight: 500;
   }
 
-  /* Отступ снизу под нижнюю навигацию */
-  .app { padding-bottom: 60px; }
+  /* Отступы под фиксированные верхнее и нижнее меню */
+  .app {
+    padding-top: 52px;
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0));
+  }
 
   /* Сетка: одна колонка */
   .page-grid {
