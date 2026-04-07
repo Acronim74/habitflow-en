@@ -1178,6 +1178,10 @@ body {
    ТЕЛЕФОН: ≤ 480px
    ════════════════════════════ */
 @media (max-width: 480px) {
+  .ob-overlay { padding: 12px; }
+  .ob-wizard { max-height: 95vh; }
+  .ob-body { padding: 18px 18px 14px; }
+  .ob-footer { padding: 0 18px 18px; }
 
   /* Топнавбар: бренд + action-иконки */
   .nav-tabs  { display: none; }
@@ -1530,6 +1534,9 @@ body {
   border-radius: 20px;
   width: 100%;
   max-width: 480px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -1575,9 +1582,11 @@ body {
 
 .ob-body {
   padding: 24px 28px;
-  min-height: 320px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .ob-ico   { font-size: 40px; margin-bottom: 14px; }
@@ -1883,6 +1892,7 @@ body {
 /* Футер мастера */
 .ob-footer {
   padding: 0 28px 24px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
