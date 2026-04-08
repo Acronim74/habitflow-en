@@ -73,6 +73,20 @@ function renderScreen() {
 function renderAll() {
   renderNav();
   renderScreen();
+  _syncMoodToggleUI();
+}
+
+/** Синхронизирует переключатель дневника настроения: вкладка «Привычки» и меню «Виджеты». */
+function _syncMoodToggleUI() {
+  const on = moodEnabled;
+  ['moodToggleBtn', 'moodToggleBurger'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.style.background = on ? 'var(--accent)' : 'var(--border2)';
+    const knob = btn.querySelector('.mood-toggle-knob') || btn.firstElementChild;
+    if (knob) knob.style.left = on ? '23px' : '3px';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
 }
 
 // ── Экран Привычки ────────────────────────
@@ -136,15 +150,17 @@ function renderHabits() {
             <button type="button"
                     onclick="toggleMood()"
                     id="moodToggleBtn"
+                    aria-pressed="${moodEnabled ? 'true' : 'false'}"
+                    aria-label="Дневник настроения"
                     style="width:44px;height:24px;border-radius:12px;
                            border:none;cursor:pointer;
                            position:relative;transition:background .2s;
                            background:${moodEnabled ? 'var(--accent)' : 'var(--border2)'}">
-              <div style="width:18px;height:18px;border-radius:50%;
+              <span class="mood-toggle-knob" style="display:block;width:18px;height:18px;border-radius:50%;
                           background:#fff;position:absolute;top:3px;
                           transition:left .2s;
                           left:${moodEnabled ? '23px' : '3px'}">
-              </div>
+              </span>
             </button>
           </div>
         </div>
@@ -256,13 +272,7 @@ function confirmDeleteArchived(habitId) {
 function toggleMood() {
   moodEnabled = !moodEnabled;
   saveData();
-
-  const btn = document.getElementById('moodToggleBtn');
-  if (btn) {
-    btn.style.background = moodEnabled ? 'var(--accent)' : 'var(--border2)';
-    const dot = btn.querySelector('div');
-    if (dot) dot.style.left = moodEnabled ? '23px' : '3px';
-  }
+  _syncMoodToggleUI();
 
   const moodSection = document.getElementById('moodSection');
   if (moodSection) {
@@ -1727,6 +1737,7 @@ function toggleBurger() {
     drawer.classList.add('open');
     overlay.classList.add('open');
     btn.classList.add('open');
+    _syncMoodToggleUI();
   }
 }
 
@@ -1776,6 +1787,7 @@ document.addEventListener('DOMContentLoaded', () => {
   navigate('today');
   renderNav();
   checkBadges();
+  _syncMoodToggleUI();
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

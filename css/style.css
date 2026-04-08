@@ -1560,9 +1560,9 @@ body {
 
   #todayLeft .divider { display: none; }
 
-  /* РќР°СЃС‚СЂРѕРµРЅРёРµ вЂ” РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅР°СЏ РєР°СЂС‚РѕС‡РєР° РЅР° РІСЃСЋ С€РёСЂРёРЅСѓ */
+  /* Настроение — горизонтальная карточка на всю ширину.
+     Не задаём display: block !important: иначе перебивается .hidden и тогл не скрывает блок. */
   #todayLeft #moodSection {
-    display: block !important;
     overflow: visible;
     flex-shrink: 0;
     width: 100%;
@@ -2345,6 +2345,56 @@ body {
   width: 20px;
   text-align: center;
   flex-shrink: 0;
+}
+
+.burger-widget-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px 10px;
+  font-size: 13px;
+  color: var(--text1);
+}
+
+.burger-widget-ico {
+  font-size: 15px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.burger-widget-label {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.burger-widget-toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background .2s;
+  padding: 0;
+  background: var(--border2);
+  font: inherit;
+}
+
+.burger-widget-toggle .mood-toggle-knob {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: left .2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 /* РўРµРјС‹ РІРЅСѓС‚СЂРё РґСЂРѕРІРµСЂР° */
