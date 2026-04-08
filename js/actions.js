@@ -1,4 +1,4 @@
-// ── Чек полезной привычки ──────────────────
+﻿// ── Чек полезной привычки ──────────────────
 
 function toggleCheck(habitId) {
   const h  = habits.find(x => x.id === habitId);
@@ -77,7 +77,7 @@ function toggleCheck(habitId) {
     const fallbackTimer = setTimeout(() => {
       el.removeEventListener('transitionend', onEnd);
       finish();
-    }, 2500);
+    }, 1600);
     return;
   }
 
@@ -663,7 +663,7 @@ function _flipBadCard(habitId, state) {
   }
   // Флипаем
   requestAnimationFrame(() => {
-    card.style.transform = 'rotateY(180deg)';
+    card.style.transform = 'rotateX(-180deg)';
   });
   return true;
 }
@@ -672,7 +672,9 @@ function _unflipBadCard(habitId) {
   const card = document.getElementById('bcard-' + habitId);
   if (!card) return false;
   requestAnimationFrame(() => {
-    card.style.transform = 'rotateY(0deg)';
+    card.style.transform = 'rotateX(0deg)';
   });
   return true;
 }
+
+

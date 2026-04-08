@@ -1,4 +1,4 @@
-// ── Сегментный прогресс дня ─────────────────
+﻿// ── Сегментный прогресс дня ─────────────────
 
 const _SEG_LEVELS = [20, 40, 60, 80, 100];
 const _SEG_COLORS = ['#95d5b2', '#74c69d', '#52b788', '#2d6a4f', '#1a4d38'];
@@ -472,7 +472,7 @@ function _buildBCard(h, tk) {
   wrap.innerHTML = `
     <div class="bcard${state !== 'neutral' ? ' bc-flipped' : ''}"
          id="bcard-${h.id}"
-         style="transform:${state !== 'neutral' ? 'rotateY(180deg)' : 'rotateY(0deg)'}">
+         style="transform:${state !== 'neutral' ? 'rotateX(-180deg)' : 'rotateX(0deg)'}">
 
       <!-- Лицевая сторона -->
       <div data-face="front" style="position:absolute;inset:0;
@@ -523,7 +523,7 @@ function _buildBCard(h, tk) {
       <div data-face="back" style="position:absolute;inset:0;
                   backface-visibility:hidden;
                   -webkit-backface-visibility:hidden;
-                  transform:rotateY(180deg);
+                  transform:rotateX(-180deg);
                   background:${backBg};
                   border-radius:var(--r-lg);
                   display:flex;align-items:center;
@@ -641,3 +641,4 @@ function _renderBadgesGrid() {
   document.getElementById('badgesTitle').textContent =
     'Значки · ' + earnedBadges.length + ' из ' + BADGES.length;
 }
+
