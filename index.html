@@ -176,50 +176,46 @@
         <!-- Заголовок блока -->
         <div class="panel-title">Сегодня</div>
 
-        <!-- Строка: сегменты слева + стрик справа -->
-        <div class="dash-row">
-
-          <!-- Левая карточка: сегментный индикатор -->
-          <div class="dash-gauge-card">
-            <div id="segWrap" style="display:flex;flex-direction:column;gap:3px;width:100%">
-              <div id="seg-100" class="seg-bar">100%</div>
-              <div id="seg-80"  class="seg-bar">80%</div>
-              <div id="seg-60"  class="seg-bar">60%</div>
-              <div id="seg-40"  class="seg-bar">40%</div>
-              <div id="seg-20"  class="seg-bar">20%</div>
-            </div>
-            <div style="display:flex;align-items:baseline;justify-content:space-between;width:100%;margin-top:4px">
-              <div id="gaugePct"
-                   style="font-size:18px;font-weight:500;color:var(--text1)">0%</div>
-              <div class="donut-meta" id="donutMeta"
-                   style="font-size:10px;color:var(--text3)">0 из 0</div>
-            </div>
+        <!-- Карточка прогресса дня (отдельно, над стриком) -->
+        <div class="dash-gauge-card dash-gauge-card--top">
+          <div id="segWrap" style="display:flex;flex-direction:column;gap:3px;width:100%">
+            <div id="seg-100" class="seg-bar">100%</div>
+            <div id="seg-80"  class="seg-bar">80%</div>
+            <div id="seg-60"  class="seg-bar">60%</div>
+            <div id="seg-40"  class="seg-bar">40%</div>
+            <div id="seg-20"  class="seg-bar">20%</div>
           </div>
-
-          <!-- Правая карточка: стрик -->
-          <div class="dash-streak-card">
-            <div>
-              <div style="font-size:10px;color:var(--text3)">Лучший стрик</div>
-              <div style="margin-top:3px">
-                <span style="font-size:20px;font-weight:500" id="streakVal">0</span>
-                <span style="font-size:11px;color:var(--text3)"> дней</span>
-              </div>
-            </div>
-            <div class="divider"></div>
-            <div>
-              <div style="font-size:10px;color:var(--text3)">Серия</div>
-              <div style="font-size:11px;color:var(--streak-color);margin-top:3px"
-                   id="streakName">—</div>
-            </div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;width:100%;margin-top:4px">
+            <div id="gaugePct"
+                 style="font-size:18px;font-weight:500;color:var(--text1)">0%</div>
+            <div class="donut-meta" id="donutMeta"
+                 style="font-size:10px;color:var(--text3)">0 из 0</div>
           </div>
+        </div>
 
+        <!-- Личный рекорд (дней подряд; между прогрессом и серией) -->
+        <div class="dash-streak-card dash-streak-card--best">
+          <div class="dash-streak-best-line">
+            <span class="dash-streak-best-lbl">Личный рекорд</span>
+            <span class="dash-streak-best-val">
+              <span id="streakVal">0</span><span class="dash-streak-best-unit"> дней</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Серия (название привычки; длинное — переносится) -->
+        <div class="dash-streak-card dash-streak-card--series">
+          <div class="dash-streak-series-line">
+            <span class="dash-streak-series-lbl">Серия</span>
+            <span class="dash-streak-series-val" id="streakName">—</span>
+          </div>
         </div>
 
         <!-- Настроение -->
         <div id="moodSection" class="hidden">
           <div class="divider"></div>
           <div class="mood-compact-row">
-            <div style="font-size:10px;color:var(--text3);flex-shrink:0">Настроение</div>
+            <div class="mood-compact-label">Отметь настроение</div>
             <div class="mood-row" id="moodRow"></div>
           </div>
         </div>
