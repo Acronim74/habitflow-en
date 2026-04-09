@@ -131,7 +131,7 @@ function openSlip(habitId) {
     <p style="font-size:13px;color:var(--text2);margin-bottom:14px">
       ${esc(h.name)}<br>
       <span style="font-size:12px;color:var(--text3)">
-        Стрик будет сброшен. Честность — часть прогресса.
+        Личный рекорд будет сброшен. Честность — часть прогресса.
       </span>
     </p>
     <div class="field">

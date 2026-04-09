@@ -1,7 +1,7 @@
 // ── Навигация ─────────────────────────────
 
 let _obStep = 0;
-const _OB_TOTAL = 6;
+const _OB_TOTAL = 8;
 
 /** Короткие заголовки для строки прогресса (как в макете). */
 const _OB_HEADINGS = [
@@ -10,6 +10,8 @@ const _OB_HEADINGS = [
   'СОЗДАНИЕ ПРИВЫЧКИ',
   'СЕРИИ И ОЧКИ',
   'АНАЛИТИКА И ЗНАЧКИ',
+  'МЕНЮ НАСТРОЕК',
+  'УСТАНОВКА ПРИЛОЖЕНИЯ',
   'ТВОИ ДАННЫЕ',
 ];
 
@@ -389,7 +391,7 @@ function _buildHabitManageCard(h) {
       </div>
     </div>
     <div class="flex gap-12 mt-8" style="font-size:12px;color:var(--text3)">
-      <span>${h.bad ? '🛡️' : '🔥'} Стрик: ${streak} дн.</span>
+      <span>${h.bad ? '🛡️' : '🔥'} Личный рекорд: ${streak} дн.</span>
       <span>🏆 Рекорд: ${best} дн.</span>
     </div>`;
   return div;
@@ -1108,7 +1110,7 @@ function _renderHmBad() {
     </div>
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="font-size:16px;font-weight:500">${cleanStrk} дн.</div>
-      <div style="font-size:10px;color:var(--text3)">текущий стрик</div>
+      <div style="font-size:10px;color:var(--text3)">текущий Личный рекорд</div>
     </div>`;
 }
 
@@ -1648,6 +1650,58 @@ function _obSteps() {
        <div class="ob-hint-ico">💡</div>
        <div class="ob-hint-text">Стадии: Начало → В ритме → Устойчивость →
          Сила привычки → Опора → Мастер</div>
+     </div>`,
+
+    // ── Шаг 6: Меню настроек ──
+    `<div class="ob-ico">☰</div>
+     <div class="ob-title">Меню настроек</div>
+     <div class="ob-text">Нажми кнопку ☰ в правом верхнем углу —
+       откроется меню с настройками приложения.</div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">🎨</div>
+       <div class="ob-data-text">Тема — четыре варианта оформления:
+         светлая, тёмная, Трон и Blade Runner</div>
+     </div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">📊</div>
+       <div class="ob-data-text">Виджеты — включай и выключай карточки
+         прогресса, Личного рекорда и настроения</div>
+     </div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">💾</div>
+       <div class="ob-data-text">Данные — экспорт и импорт резервных копий</div>
+     </div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">🎓</div>
+       <div class="ob-data-text">Знакомство — повторно открыть этот тур
+         в любой момент</div>
+     </div>`,
+
+    // ── Шаг 7: Установка на телефон или ПК ──
+    `<div class="ob-ico">📲</div>
+     <div class="ob-title">Установи как приложение</div>
+     <div class="ob-text">HabitFlow можно установить на телефон или компьютер —
+       будет работать как обычное приложение без браузерной строки.</div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">🤖</div>
+       <div class="ob-data-text"><b>Android:</b> открой в Chrome →
+         меню ⋮ → «Добавить на главный экран»</div>
+     </div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">🍎</div>
+       <div class="ob-data-text"><b>iPhone:</b> открой в Safari →
+         кнопка «Поделиться» → «На экран Домой»</div>
+     </div>
+     <div class="ob-data-row">
+       <div class="ob-data-ico">💻</div>
+       <div class="ob-data-text"><b>ПК (Chrome/Edge):</b> нажми иконку
+         установки в адресной строке справа →
+         «Установить»</div>
+     </div>
+     <div class="ob-hint" style="margin-top:8px">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">После установки приложение работает
+         полностью офлайн — данные хранятся на устройстве.</div>
      </div>`,
 
     `<div class="ob-ico">💾</div>
