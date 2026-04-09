@@ -73,7 +73,7 @@ function renderNav() {
   const avt = document.getElementById('navAvText');
   if (avt) {
     avt.textContent =
-      stage.nameRU + ' · ' + total.toLocaleString() + ' pts';
+      stage.name + ' · ' + total.toLocaleString() + ' pts';
   }
 }
 
@@ -644,9 +644,9 @@ function _renderXP() {
   const stage    = getStage(total);
   const next     = nextStage(total);
 
-  document.getElementById('xpStage').textContent = stage.nameRU;
+  document.getElementById('xpStage').textContent = stage.name;
   document.getElementById('xpNext').textContent  =
-    next ? '→ ' + next.nameRU : 'Макс. уровень';
+    next ? '→ ' + next.name : 'Max level';
 
   const pct = next
     ? Math.round((total - stage.pts) / (next.pts - stage.pts) * 100)
@@ -667,7 +667,7 @@ function _renderBadgesGrid() {
     const cell = document.createElement('div');
     cell.className = 'badge-cell ' + (earned ? 'earned' : 'locked');
     cell.textContent = b.emoji;
-    cell.title = b.nameRU + (earned ? '' : ' · ' + b.descRU);
+    cell.title = b.name + (earned ? '' : ' · ' + b.desc);
     grid.appendChild(cell);
   });
   document.getElementById('badgesTitle').textContent =

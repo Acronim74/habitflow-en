@@ -1336,11 +1336,11 @@ function renderBadges() {
                       display:flex;align-items:center;justify-content:center;
                       font-size:36px;border:3px solid ${stage.color}">
           </div>
-          <div style="font-size:16px;font-weight:500">${esc(stage.nameRU)}</div>
+          <div style="font-size:16px;font-weight:500">${esc(stage.name)}</div>
           <div style="font-size:12px;color:var(--text3);margin-top:2px">
             ${total.toLocaleString()} pts
-            ${next ? ' · ещё ' + (next.pts - total).toLocaleString()
-                     + ' до ' + esc(next.nameRU) : ''}
+            ${next ? ' · ' + (next.pts - total).toLocaleString()
+                     + ' more until ' + esc(next.name) : ''}
           </div>
         </div>
 
@@ -1354,9 +1354,9 @@ function renderBadges() {
               return `
                 <div style="text-align:center;opacity:${earned ? 1 : 0.3}">
                   <div style="font-size:32px;margin-bottom:4px">${b.emoji}</div>
-                  <div style="font-size:12px;font-weight:500">${esc(b.nameRU)}</div>
+                  <div style="font-size:12px;font-weight:500">${esc(b.name)}</div>
                   <div style="font-size:11px;color:var(--text3)">
-                    ${earned ? '✓ Получен' : esc(b.descRU)}
+                    ${earned ? '✓ Earned' : esc(b.desc)}
                   </div>
                 </div>`;
             }).join('')}
@@ -1403,8 +1403,8 @@ function _showBadgeToast(b) {
   const el = document.getElementById('badgeToast');
   if (!el) return;
   document.getElementById('badgeToastEmoji').textContent = b.emoji;
-  document.getElementById('badgeToastTitle').textContent = b.nameRU;
-  document.getElementById('badgeToastDesc').textContent  = b.descRU;
+  document.getElementById('badgeToastTitle').textContent = b.name;
+  document.getElementById('badgeToastDesc').textContent  = b.desc;
   el.style.display = 'flex';
   setTimeout(() => { el.style.display = 'none'; }, 4000);
 }

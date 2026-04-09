@@ -1,68 +1,68 @@
-// ── Константы ──────────────────────────────
+// ── Constants ──────────────────────────────
 const LS_KEY = 'habitflow_data';
 const SCHEMA_VERSION = 1;
 const TODAY  = new Date();
 
-// Стадии развития персонажа
-// Поля f (female) и m (male) с base64 PNG
-// будут добавлены из assets.js
+// Character development stages
+// Fields f (female) and m (male) with base64 PNG
+// will be added from assets.js
 const STAGES = [
-  { pts:0,     nameRU:'Начало',        emoji:'🌱',
+  { pts:0,     name:'Beginner',        emoji:'🌱',
     color:'#52b788', glow:'#95d5b2', ring:'#2d6a4f' },
-  { pts:500,   nameRU:'В ритме',       emoji:'🏃',
+  { pts:500,   name:'In the Flow',       emoji:'🏃',
     color:'#4a90d9', glow:'#89c4f0', ring:'#2167a8' },
-  { pts:2000,  nameRU:'Устойчивость',  emoji:'⚔️',
+  { pts:2000,  name:'Resilience',  emoji:'⚔️',
     color:'#e07b39', glow:'#f0b07a', ring:'#b05a1a' },
-  { pts:6000,  nameRU:'Сила привычки', emoji:'👑',
+  { pts:6000,  name:'Habit Strength', emoji:'👑',
     color:'#c47fd4', glow:'#dba8e8', ring:'#8e3fa8' },
-  { pts:15000, nameRU:'Опора',         emoji:'🎯',
+  { pts:15000, name:'Pillar',         emoji:'🎯',
     color:'#e85d4a', glow:'#f5a09a', ring:'#b02a1a' },
-  { pts:35000, nameRU:'Мастер',        emoji:'🔥',
+  { pts:35000, name:'Master',        emoji:'🔥',
     color:'#d4a017', glow:'#f0cc6a', ring:'#a07010' },
 ];
 
-// Бейджи достижений
+// Achievement badges
 const BADGES = [
   { id:'fire',
-    emoji:'🔥', nameRU:'Первый огонь',
-    descRU:'Серия 7 дней у любой привычки',
+    emoji:'🔥', name:'First Flame',
+    desc:'7-day streak on any habit',
     check: () => habits.some(h => !h.bad && calcStreak(h) >= 7) },
   { id:'diamond',
-    emoji:'💎', nameRU:'Бриллиант',
-    descRU:'Серия 30 дней у любой привычки',
+    emoji:'💎', name:'Diamond',
+    desc:'30-day streak on any habit',
     check: () => habits.some(h => !h.bad && calcStreak(h) >= 30) },
   { id:'champion',
-    emoji:'🏆', nameRU:'Чемпион',
-    descRU:'100% выполнение за полный месяц',
+    emoji:'🏆', name:'Champion',
+    desc:'100% completion for a full month',
     check: () => _checkChampion() },
   { id:'century',
-    emoji:'⚡', nameRU:'Центурион',
-    descRU:'Серия 100 дней у любой привычки',
+    emoji:'⚡', name:'Centurion',
+    desc:'100-day streak on any habit',
     check: () => habits.some(h => !h.bad && calcStreak(h) >= 100) },
   { id:'owl',
-    emoji:'🌙', nameRU:'Сова',
-    descRU:'Отметка после 21:00 в 7 разных дней',
+    emoji:'🌙', name:'Night Owl',
+    desc:'Checked in after 9 PM on 7 different days',
     check: () => _checkTimeBadge(21, 24, 7) },
   { id:'bird',
-    emoji:'🌅', nameRU:'Жаворонок',
-    descRU:'Отметка до 07:00 в 7 разных дней',
+    emoji:'🌅', name:'Early Bird',
+    desc:'Checked in before 7 AM on 7 different days',
     check: () => _checkTimeBadge(0, 7, 7) },
   { id:'legend',
-    emoji:'🎯', nameRU:'Легенда',
-    descRU:'Серия 365 дней у любой привычки',
+    emoji:'🎯', name:'Legend',
+    desc:'365-day streak on any habit',
     check: () => habits.some(h => !h.bad && calcStreak(h) >= 365) },
   { id:'lucky',
-    emoji:'🍀', nameRU:'Удача',
-    descRU:'7 и более привычек за один день',
+    emoji:'🍀', name:'Lucky',
+    desc:'7 or more habits completed in one day',
     check: () => _checkLucky() },
 ];
 
-// Настроение — подписи (картинки придут из assets.js)
+// Mood — labels (images from assets.js)
 const MOOD_LABELS = [
-  'Тяжело', 'Так себе', 'Нормально', 'Хорошо', 'Отлично'
+  'Rough', 'Meh', 'Okay', 'Good', 'Great'
 ];
 
-/** Одна палитра для кнопок настроения, графика и аналитики */
+/** One palette for mood buttons, chart and analytics */
 const MOOD_COLORS = [
   '#c62828',
   '#e65100',
@@ -71,30 +71,30 @@ const MOOD_COLORS = [
   '#14532d',
 ];
 
-// Категории привычек
+// Habit categories
 const CATEGORIES = [
-  { name:'Здоровье',   icon:'💪' },
-  { name:'Спорт',      icon:'🏃' },
-  { name:'Питание',    icon:'🥗' },
-  { name:'Сон',        icon:'😴' },
-  { name:'Учёба',      icon:'📚' },
-  { name:'Работа',     icon:'💼' },
-  { name:'Медитация',  icon:'🧘' },
-  { name:'Творчество', icon:'🎨' },
-  { name:'Финансы',    icon:'💰' },
-  { name:'Социальное', icon:'👥' },
+  { name:'Health',   icon:'💪' },
+  { name:'Sport',      icon:'🏃' },
+  { name:'Nutrition',    icon:'🥗' },
+  { name:'Sleep',        icon:'😴' },
+  { name:'Learning',      icon:'📚' },
+  { name:'Work',     icon:'💼' },
+  { name:'Meditation',  icon:'🧘' },
+  { name:'Creativity', icon:'🎨' },
+  { name:'Finance',    icon:'💰' },
+  { name:'Social', icon:'👥' },
 ];
 
-// Системы очков (справочно в комментариях в ТЗ)
+// Points systems (reference in spec comments)
 
-// ── Демо-данные для онбординга ─────────────
+// ── Demo data for onboarding ─────────────
 const DEMO_HABITS = [
   {
     id: 'demo-1',
-    name: 'Утренняя пробежка',
+    name: 'Morning Run',
     icon: '🏃',
-    category: 'Спорт',
-    desc: 'Бег 20–30 минут каждое утро',
+    category: 'Sport',
+    desc: 'Run 20–30 minutes every morning',
     bad: false,
     schedule: null,
     checks: {},
@@ -106,10 +106,10 @@ const DEMO_HABITS = [
   },
   {
     id: 'demo-2',
-    name: 'Читать 20 минут',
+    name: 'Read 20 Minutes',
     icon: '📚',
-    category: 'Учёба',
-    desc: 'Любая книга перед сном',
+    category: 'Learning',
+    desc: 'Any book before bed',
     bad: false,
     schedule: [0,1,2,3,4],
     checks: {},
@@ -121,10 +121,10 @@ const DEMO_HABITS = [
   },
   {
     id: 'demo-3',
-    name: 'Медитация',
+    name: 'Meditation',
     icon: '🧘',
-    category: 'Здоровье',
-    desc: '10 минут утром',
+    category: 'Health',
+    desc: '10 minutes in the morning',
     bad: false,
     schedule: null,
     checks: {},
@@ -136,7 +136,7 @@ const DEMO_HABITS = [
   },
   {
     id: 'demo-4',
-    name: 'Не курить',
+    name: 'No Smoking',
     icon: '🚫',
     category: '',
     desc: '',
