@@ -39,6 +39,12 @@
 - Экспорт / импорт JSON через кнопки в навбаре
 - Подтверждение перед перезаписью данных при импорте
 
+**Network indicator (top bar)**
+- **Phone** — in **portrait** and **landscape** orientation the status is a compact **icon** (Wi‑Fi / offline) to save space next to the menu.
+- **Tablet and desktop** — **text** badge (Online / Offline).
+
+Portrait matches the narrow mobile layout (bottom navigation). Landscape phones use a touch + viewport rule so the indicator stays an icon (see comments in `css/style.css`).
+
 ---
 
 ## Установка как PWA
