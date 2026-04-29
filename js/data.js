@@ -3,9 +3,7 @@ const LS_KEY = 'habitflow_data';
 const SCHEMA_VERSION = 1;
 const TODAY  = new Date();
 
-// Character development stages
-// Fields f (female) and m (male) with base64 PNG
-// will be added from assets.js
+// Стадии развития персонажа
 const STAGES = [
   { pts:0,     name:'Beginner',        emoji:'🌱',
     color:'#52b788', glow:'#95d5b2', ring:'#2d6a4f' },
@@ -57,7 +55,7 @@ const BADGES = [
     check: () => _checkLucky() },
 ];
 
-// Mood — labels (images from assets.js)
+// Настроение — подписи
 const MOOD_LABELS = [
   'Rough', 'Meh', 'Okay', 'Good', 'Great'
 ];
