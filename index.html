@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HabitFlow</title>
-  <meta name="description" content="Офлайн трекер привычек">
+  <meta name="description" content="Offline habit tracker — your data stays on your device">
   <meta name="theme-color" content="#2d6a4f">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -51,22 +51,22 @@
     <div class="nav-brand">
       <div class="nav-brand-icon">🌿</div>
       <span class="nav-brand-name">HabitFlow</span>
-      <span class="nav-mobile-screen" id="navScreenName">Сегодня</span>
+      <span class="nav-mobile-screen" id="navScreenName">Today</span>
       <div class="nav-mobile-date">
-        <div class="nav-mobile-date-main" id="navDateMain">1 января</div>
-        <div class="nav-mobile-date-week" id="navDateWeek">понедельник</div>
+        <div class="nav-mobile-date-main" id="navDateMain">January 1</div>
+        <div class="nav-mobile-date-week" id="navDateWeek">Monday</div>
       </div>
     </div>
 
     <div class="nav-tabs">
       <button class="nav-tab active" data-screen="today"
-              type="button" onclick="navigate('today')">☀️ Сегодня</button>
+              type="button" onclick="navigate('today')">☀️ Today</button>
       <button class="nav-tab" data-screen="habits"
-              type="button" onclick="navigate('habits')">✅ Привычки</button>
+              type="button" onclick="navigate('habits')">✅ Habits</button>
       <button class="nav-tab" data-screen="analytics"
-              type="button" onclick="navigate('analytics')">📊 Аналитика</button>
+              type="button" onclick="navigate('analytics')">📊 Analytics</button>
       <button class="nav-tab" data-screen="badges"
-              type="button" onclick="navigate('badges')">🏅 Значки</button>
+              type="button" onclick="navigate('badges')">🏅 Badges</button>
     </div>
 
     <div class="nav-right">
@@ -78,13 +78,13 @@
       <!-- Аватар (только ПК) -->
       <button class="nav-avatar" type="button" onclick="navigate('badges')">
         <div class="nav-av-pic" id="navAvPic">🌱</div>
-        <span class="nav-av-text" id="navAvText">Начало · 0 pts</span>
+        <span class="nav-av-text" id="navAvText">Beginner · 0 pts</span>
       </button>
 
       <!-- Бургер-кнопка -->
       <button class="burger-btn" type="button"
               onclick="toggleBurger()" id="burgerBtn"
-              title="Меню">
+              title="Menu">
         <span class="burger-line"></span>
         <span class="burger-line"></span>
         <span class="burger-line"></span>
@@ -100,7 +100,7 @@
 
       <!-- Тема -->
       <div class="burger-section">
-        <div class="burger-section-title">Тема</div>
+        <div class="burger-section-title">Theme</div>
         <div class="burger-theme-grid">
           <button type="button" class="theme-btn active"
                   data-theme="light" onclick="setTheme('light')">
@@ -127,40 +127,40 @@
 
       <!-- Виджеты (главный экран): прогресс дня → рекорд → серия → настроение -->
       <div class="burger-section">
-        <div class="burger-section-title">Виджеты</div>
+        <div class="burger-section-title">Widgets</div>
         <div class="burger-widget-row">
           <span class="burger-widget-ico" aria-hidden="true">📊</span>
-          <span class="burger-widget-label">Прогресс дня</span>
+          <span class="burger-widget-label">Day progress</span>
           <button type="button" class="burger-widget-toggle" id="dayProgressWidgetToggleBurger"
                   onclick="toggleDayProgressWidget()"
-                  aria-label="Показывать карточку «Прогресс дня» на экране «Сегодня»">
+                  aria-label="Show Day progress card on Today screen">
             <span class="mood-toggle-knob"></span>
           </button>
         </div>
         <div class="burger-widget-row">
           <span class="burger-widget-ico" aria-hidden="true">🏆</span>
-          <span class="burger-widget-label">Личный рекорд</span>
+          <span class="burger-widget-label">Personal best</span>
           <button type="button" class="burger-widget-toggle" id="bestStreakWidgetToggleBurger"
                   onclick="toggleBestStreakWidget()"
-                  aria-label="Показывать карточку «Личный рекорд» на экране «Сегодня»">
+                  aria-label="Show Personal best card on Today screen">
             <span class="mood-toggle-knob"></span>
           </button>
         </div>
         <div class="burger-widget-row">
           <span class="burger-widget-ico" aria-hidden="true">🔥</span>
-          <span class="burger-widget-label">Серия</span>
+          <span class="burger-widget-label">Streak</span>
           <button type="button" class="burger-widget-toggle" id="seriesWidgetToggleBurger"
                   onclick="toggleSeriesWidget()"
-                  aria-label="Показывать карточку «Серия» на экране «Сегодня»">
+                  aria-label="Show Streak card on Today screen">
             <span class="mood-toggle-knob"></span>
           </button>
         </div>
         <div class="burger-widget-row">
           <span class="burger-widget-ico" aria-hidden="true">😊</span>
-          <span class="burger-widget-label">Настроение</span>
+          <span class="burger-widget-label">Mood</span>
           <button type="button" class="burger-widget-toggle" id="moodToggleBurger"
                   onclick="toggleMood()"
-                  aria-label="Показывать виджет настроения на экране «Сегодня»">
+                  aria-label="Show mood widget on Today screen">
             <span class="mood-toggle-knob"></span>
           </button>
         </div>
@@ -168,16 +168,16 @@
 
       <!-- Данные -->
       <div class="burger-section">
-        <div class="burger-section-title">Данные</div>
+        <div class="burger-section-title">Data</div>
         <button type="button" class="burger-item"
                 onclick="exportData();closeBurger()">
           <span class="burger-item-ico">💾</span>
-          <span>Сохранить копию</span>
+          <span>Save backup</span>
         </button>
         <button type="button" class="burger-item"
                 onclick="triggerImport();closeBurger()">
           <span class="burger-item-ico">📂</span>
-          <span>Загрузить копию</span>
+          <span>Load backup</span>
         </button>
       </div>
 
@@ -213,22 +213,22 @@
     <button class="bottom-nav-item active" data-screen="today"
             type="button" onclick="navigate('today')">
       <span class="bottom-nav-ico">☀️</span>
-      <span class="bottom-nav-lbl">Сегодня</span>
+      <span class="bottom-nav-lbl">Today</span>
     </button>
     <button class="bottom-nav-item" data-screen="habits"
             type="button" onclick="navigate('habits')">
       <span class="bottom-nav-ico">✅</span>
-      <span class="bottom-nav-lbl">Привычки</span>
+      <span class="bottom-nav-lbl">Habits</span>
     </button>
     <button class="bottom-nav-item" data-screen="analytics"
             type="button" onclick="navigate('analytics')">
       <span class="bottom-nav-ico">📊</span>
-      <span class="bottom-nav-lbl">Аналитика</span>
+      <span class="bottom-nav-lbl">Analytics</span>
     </button>
     <button class="bottom-nav-item" data-screen="badges"
             type="button" onclick="navigate('badges')">
       <span class="bottom-nav-ico">🏅</span>
-      <span class="bottom-nav-lbl">Значки</span>
+      <span class="bottom-nav-lbl">Badges</span>
     </button>
   </nav>
 
@@ -240,7 +240,7 @@
       <div class="panel panel-body" id="todayLeft">
 
         <!-- Заголовок левой колонки «Сегодня» (на ПК/планшете; на телефоне скрыт в CSS) -->
-        <div class="panel-title">Итоги дня</div>
+        <div class="panel-title">Today's summary</div>
 
         <!-- Карточка прогресса дня (отдельно, над стриком) -->
         <div id="dayProgressSection" class="dash-gauge-card dash-gauge-card--top">
@@ -264,9 +264,9 @@
         <!-- Личный рекорд (дней подряд; между прогрессом и серией) -->
         <div id="streakBestSection" class="dash-streak-card dash-streak-card--best">
           <div class="dash-streak-best-line">
-            <span class="dash-streak-best-lbl">Личный рекорд</span>
+            <span class="dash-streak-best-lbl">Personal best</span>
             <span class="dash-streak-best-val">
-              <span id="streakVal">0</span><span class="dash-streak-best-unit"> дней</span>
+              <span id="streakVal">0</span><span class="dash-streak-best-unit"> days</span>
             </span>
           </div>
         </div>
@@ -274,7 +274,7 @@
         <!-- Серия (название привычки; длинное — переносится) -->
         <div id="streakSeriesSection" class="dash-streak-card dash-streak-card--series">
           <div class="dash-streak-series-line">
-            <span class="dash-streak-series-lbl">Серия</span>
+            <span class="dash-streak-series-lbl">Streak</span>
             <span class="dash-streak-series-val" id="streakName">—</span>
           </div>
         </div>
@@ -283,7 +283,7 @@
         <div id="moodSection" class="hidden">
           <div class="divider"></div>
           <div class="mood-compact-row">
-            <div class="mood-compact-label">Отметь настроение</div>
+            <div class="mood-compact-label">Track your mood</div>
             <div class="mood-row" id="moodRow"></div>
           </div>
         </div>
@@ -296,8 +296,8 @@
 
         <!-- Полезные -->
         <div class="sec-header">
-          <span class="sec-label">Полезные привычки</span>
-          <span class="sec-badge" id="goodBadge">0 из 0</span>
+          <span class="sec-label">Good habits</span>
+          <span class="sec-badge" id="goodBadge">0 of 0</span>
         </div>
         <div id="goodList"
              style="display:flex;flex-direction:column;gap:6px"></div>
@@ -305,8 +305,8 @@
         <!-- Бонусные (скрыты по умолчанию) -->
         <div id="bonusSection" class="hidden">
           <div class="sec-header">
-            <span class="sec-label">Бонусные привычки</span>
-            <span class="sec-badge bonus">выходной · +10 pts</span>
+            <span class="sec-label">Bonus habits</span>
+            <span class="sec-badge bonus">day off · +10 pts</span>
           </div>
           <div id="bonusList"
                style="display:flex;flex-direction:column;gap:6px"></div>
@@ -315,7 +315,7 @@
         <!-- Вредные (скрыты если нет) -->
         <div id="badSection" class="hidden">
           <div class="sec-header" style="margin-top:4px">
-            <span class="sec-label">Вредные привычки</span>
+            <span class="sec-label">Bad habits</span>
             <span class="sec-badge bad" id="badBadge"></span>
           </div>
           <div id="badList"
@@ -324,9 +324,9 @@
           <!-- Прогресс вредных -->
           <div class="progress-block">
             <div class="progress-header">
-              <span class="progress-label">Сдержался сегодня</span>
+              <span class="progress-label">Held strong today</span>
               <span class="progress-pct" id="badPct"
-                    style="color:var(--accent)">0 из 0</span>
+                    style="color:var(--accent)">0 of 0</span>
             </div>
             <div class="bad-bar-track">
               <div class="bad-bar-green" id="badBarGreen"
@@ -338,17 +338,17 @@
               <div class="bar-legend-item">
                 <div class="bar-legend-dot"
                      style="background:var(--accent)"></div>
-                <span id="badLgGreen">Выдержал: 0</span>
+                <span id="badLgGreen">Held: 0</span>
               </div>
               <div class="bar-legend-item">
                 <div class="bar-legend-dot"
                      style="background:var(--bad)"></div>
-                <span id="badLgRed">Срывов: 0</span>
+                <span id="badLgRed">Slips: 0</span>
               </div>
               <div class="bar-legend-item">
                 <div class="bar-legend-dot"
                      style="background:var(--border2)"></div>
-                <span id="badLgGray">Не отмечено: 0</span>
+                <span id="badLgGray">Unmarked: 0</span>
               </div>
             </div>
           </div>
@@ -361,7 +361,7 @@
 
         <!-- Хитмап 30 дней -->
         <div class="panel panel-body">
-          <div class="panel-title">Активность · 30 дней</div>
+          <div class="panel-title">Activity · 30 days</div>
           <div class="heatmap" id="heatmap30"></div>
           <div class="bar-legend" style="margin-top:8px;
                                           justify-content:flex-end">
@@ -374,7 +374,7 @@
                    style="background:var(--accent2)"></div>
               <div class="bar-legend-dot"
                    style="background:var(--accent)"></div>
-              <span style="margin-left:2px">меньше → больше</span>
+              <span style="margin-left:2px">less → more</span>
             </div>
           </div>
         </div>
@@ -382,8 +382,8 @@
         <!-- XP -->
         <div class="panel panel-body">
           <div class="xp-row">
-            <span class="xp-stage" id="xpStage">Искатель</span>
-            <span class="xp-next"  id="xpNext">→ Следопыт</span>
+            <span class="xp-stage" id="xpStage">Beginner</span>
+            <span class="xp-next"  id="xpNext">→ In the Flow</span>
           </div>
           <div class="xp-track">
             <div class="xp-fill" id="xpFill" style="width:0%"></div>
@@ -396,14 +396,14 @@
 
         <!-- Значки -->
         <div class="panel panel-body">
-          <div class="panel-title" id="badgesTitle">Значки · 0 из 8</div>
+          <div class="panel-title" id="badgesTitle">Badges · 0 of 8</div>
           <div class="badges-grid" id="badgesGrid"></div>
         </div>
 
         <!-- Добавить привычку -->
         <button class="btn-add" type="button" onclick="openCreate('good')">
           <span class="btn-add-ico">+</span>
-          Добавить привычку
+          Add habit
         </button>
 
       </div>
@@ -440,7 +440,7 @@
   <div class="modal guide-modal" onclick="event.stopPropagation()">
     <div class="guide-modal-head">
       <button type="button" class="btn btn-ghost guide-close"
-              onclick="closeGuide()">Закрыть</button>
+              onclick="closeGuide()">Close</button>
     </div>
     <div class="guide-body" id="guideBody"></div>
   </div>

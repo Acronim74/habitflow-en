@@ -274,11 +274,11 @@ function _checkLucky() {
 function scheduleLabel(h) {
   if (!h.schedule || h.schedule.length === 0 ||
       h.schedule.length === 7) return '';
-  const names = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const names = ['Mo','Tu','We','Th','Fr','Sa','Su'];
   if (JSON.stringify(h.schedule) === JSON.stringify([0,1,2,3,4]))
-    return ' · Будни';
+    return ' · Weekdays';
   if (JSON.stringify(h.schedule) === JSON.stringify([5,6]))
-    return ' · Выходные';
+    return ' · Weekend';
   return ' · ' + h.schedule.map(i => names[i]).join(',');
 }
 

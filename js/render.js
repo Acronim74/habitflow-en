@@ -71,7 +71,7 @@ function _renderTodayChrome() {
 
   const dateEl = document.getElementById('todayDate');
   if (dateEl) {
-    dateEl.textContent = TODAY.toLocaleDateString('ru-RU', {
+    dateEl.textContent = TODAY.toLocaleDateString('en-US', {
       weekday: 'long', day: 'numeric', month: 'long'
     });
   }
@@ -86,8 +86,8 @@ function _renderTodayChrome() {
   // Бонусные добавляют до 20% поверх 100%
   const displayPct = Math.min(120, basePct + Math.round(bonusPct * 0.2));
   document.getElementById('donutMeta').textContent =
-    done + ' из ' + scheduled.length +
-    (bonusDone > 0 ? ' +' + bonusDone + ' бонус' : '') + ' привычек';
+    done + ' of ' + scheduled.length +
+    (bonusDone > 0 ? ' +' + bonusDone + ' bonus' : '') + ' habits';
   _animateGauge(displayPct);
 
   let bestS = 0, bestName = '';
@@ -121,7 +121,7 @@ function _renderTodayChrome() {
   }
 
   document.getElementById('goodBadge').textContent =
-    done + ' из ' + scheduled.length +
+    done + ' of ' + scheduled.length +
     (bonusDone > 0 ? ' +' + bonusDone : '');
 
   const bonusSection = document.getElementById('bonusSection');
@@ -160,8 +160,8 @@ function _renderTodayChromeForFlip() {
     : 0;
   const displayPct = Math.min(120, basePct + Math.round(bonusPct * 0.2));
   document.getElementById('donutMeta').textContent =
-    done + ' из ' + scheduled.length +
-    (bonusDone > 0 ? ' +' + bonusDone + ' бонус' : '') + ' привычек';
+    done + ' of ' + scheduled.length +
+    (bonusDone > 0 ? ' +' + bonusDone + ' bonus' : '') + ' habits';
 
   if (_gaugeRafId) cancelAnimationFrame(_gaugeRafId);
   _gaugeRafId = null;
@@ -193,7 +193,7 @@ function _renderTodayChromeForFlip() {
   }
 
   document.getElementById('goodBadge').textContent =
-    done + ' из ' + scheduled.length +
+    done + ' of ' + scheduled.length +
     (bonusDone > 0 ? ' +' + bonusDone : '');
 
   const bonusSection = document.getElementById('bonusSection');
@@ -258,12 +258,12 @@ function _patchHCardFromModel(h, tk, isBonus) {
 
   const streak = calcStreak(h);
   const timeStr = h.times?.[tk]
-    ? new Date(h.times[tk]).toLocaleTimeString('ru-RU',
+    ? new Date(h.times[tk]).toLocaleTimeString('en-US',
         { hour: '2-digit', minute: '2-digit' })
     : '';
   const subText = streak > 0
-    ? `🔥 ${streak} дней подряд${scheduleLabel(h)}`
-    : (scheduleLabel(h).slice(3) || 'Начни серию сегодня');
+    ? `🔥 ${streak}-day streak${scheduleLabel(h)}`
+    : (scheduleLabel(h).slice(3) || 'Start your streak today');
   const subCls = streak > 0
     ? 'hcard-sub hs-streak'
     : 'hcard-sub' + (isBonus ? ' hs-bonus' : '');
@@ -371,7 +371,7 @@ function _buildHCard(h, tk, isBonus) {
   const isDone  = !!h.checks?.[tk];
   const streak  = calcStreak(h);
   const timeStr = h.times?.[tk]
-    ? new Date(h.times[tk]).toLocaleTimeString('ru-RU',
+    ? new Date(h.times[tk]).toLocaleTimeString('en-US',
         { hour:'2-digit', minute:'2-digit' })
     : '';
 
@@ -382,15 +382,15 @@ function _buildHCard(h, tk, isBonus) {
   else if (_isNextCard(h)) wrapCls += ' hc-active';
 
   const subText = streak > 0
-    ? `🔥 ${streak} дней подряд${scheduleLabel(h)}`
-    : (scheduleLabel(h).slice(3) || 'Начни серию сегодня');
+    ? `🔥 ${streak}-day streak${scheduleLabel(h)}`
+    : (scheduleLabel(h).slice(3) || 'Start your streak today');
   const subCls = streak > 0
     ? 'hcard-sub hs-streak'
     : 'hcard-sub' + (isBonus ? ' hs-bonus' : '');
 
   const backCls  = 'hcard-back' + (isBonus ? ' hback-bonus' : '');
   const backIco  = isBonus ? '★' : '✓';
-  const backTitle = isBonus ? 'Отлично!' : 'Выполнено!';
+  const backTitle = isBonus ? 'Bonus!' : 'Done!';
 
   const wrap = document.createElement('div');
   wrap.className = 'hcard-flip-wrap';
@@ -467,10 +467,10 @@ function _buildBCard(h, tk) {
   if (isSlipped) state = 'slipped';
 
   const subText = isClean
-    ? `${streak} дней без срыва`
+    ? `${streak} days clean`
     : isSlipped
-    ? 'Серия прервана · завтра новый шанс'
-    : `${streak} дней без срыва · отметь сегодня`;
+    ? 'Streak broken · fresh start tomorrow'
+    : `${streak} days clean · mark today`;
   const subCls = isClean   ? 'bcard-sub bs-ok'
                : isSlipped ? 'bcard-sub bs-bad'
                : 'bcard-sub';
@@ -478,10 +478,10 @@ function _buildBCard(h, tk) {
   // Обратная сторона зависит от действия
   const backBg    = isClean ? 'var(--accent)' : 'var(--bad)';
   const backIco   = isClean ? '✓' : '✕';
-  const backTitle = isClean ? 'Выдержал!' : 'Срыв записан';
+  const backTitle = isClean ? 'Held strong!' : 'Slip logged';
   const backSub   = isClean
-    ? streak + ' чистых дней'
-    : 'Завтра новый шанс';
+    ? streak + ' clean days'
+    : 'Fresh start tomorrow';
 
   const wrap = document.createElement('div');
   wrap.className = 'hcard-flip-wrap';
@@ -581,18 +581,18 @@ function _renderBadProgress(bad, tk) {
   document.getElementById('badBarRed').style.width   = rPct + '%';
 
   document.getElementById('badPct').textContent =
-    clean + ' из ' + total;
+    clean + ' of ' + total;
   document.getElementById('badPct').style.color =
     slipped > 0 && clean === 0 ? 'var(--bad)' : 'var(--accent)';
 
-  document.getElementById('badLgGreen').textContent = 'Выдержал: ' + clean;
-  document.getElementById('badLgRed').textContent   = 'Срывов: '   + slipped;
-  document.getElementById('badLgGray').textContent  = 'Не отмечено: ' + neutral;
+  document.getElementById('badLgGreen').textContent = 'Held: ' + clean;
+  document.getElementById('badLgRed').textContent   = 'Slips: '   + slipped;
+  document.getElementById('badLgGray').textContent  = 'Unmarked: ' + neutral;
 
   document.getElementById('badBadge').textContent =
     clean === total
-      ? 'все сдержались ✓'
-      : clean + ' ✓' + (slipped > 0 ? ' · ' + slipped + ' срыв' : '');
+      ? 'all held ✓'
+      : clean + ' ✓' + (slipped > 0 ? ' · ' + slipped + ' slip' : '');
 }
 
 // ── Хитмап 30 дней ────────────────────────
@@ -656,6 +656,6 @@ function _renderBadgesGrid() {
     grid.appendChild(cell);
   });
   document.getElementById('badgesTitle').textContent =
-    'Значки · ' + earnedBadges.length + ' из ' + BADGES.length;
+    'Badges · ' + earnedBadges.length + ' of ' + BADGES.length;
 }
 

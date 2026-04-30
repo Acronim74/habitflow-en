@@ -35,7 +35,7 @@ function toggleCheck(habitId) {
     checkBadges();
     if (allDoneCelebration) {
       spawnConfetti();
-      showToast('🎉 100% — все привычки выполнены!');
+      showToast('🎉 100% — all habits done!');
       showPtsToast(25);
     }
   }
@@ -52,7 +52,7 @@ function toggleCheck(habitId) {
     if (allDoneCelebration) {
       setTimeout(() => {
         spawnConfetti({ lite: true });
-        showToast('🎉 100% — все привычки выполнены!');
+        showToast('🎉 100% — all habits done!');
         showPtsToast(25);
       }, 500);
     }
@@ -101,7 +101,7 @@ function markBadClean(habitId) {
   }
   _renderTodayChromeForFlip();
   renderNav();
-  showToast('✓ ' + h.name + ' — сдержался!');
+  showToast('✓ ' + h.name + ' — stayed strong!');
 }
 
 function resetBadCard(habitId) {
@@ -127,21 +127,21 @@ function openSlip(habitId) {
   if (!h) return;
   const modal = document.getElementById('slipModal');
   modal.innerHTML = `
-    <div class="modal-title">Записать срыв</div>
+    <div class="modal-title">Log a slip</div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:14px">
       ${esc(h.name)}<br>
       <span style="font-size:12px;color:var(--text3)">
-        Личный рекорд будет сброшен. Честность — часть прогресса.
+        Your streak will reset. Honesty is part of the progress.
       </span>
     </p>
     <div class="field">
-      <label class="field-label">Что спровоцировало? (необязательно)</label>
+      <label class="field-label">What triggered it? (optional)</label>
       <input class="field-input" id="slipTrigger"
-             placeholder="напр. стресс, компания...">
+             placeholder="e.g. stress, social pressure...">
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closeSlip()">Отмена</button>
-      <button type="button" class="btn btn-danger">Записать срыв</button>
+      <button type="button" class="btn btn-ghost" onclick="closeSlip()">Cancel</button>
+      <button type="button" class="btn btn-danger">Log slip</button>
     </div>`;
   document.getElementById('slipOverlay').classList.add('open');
   modal.querySelector('.btn-danger').addEventListener('click', () => confirmSlip(habitId));
@@ -169,7 +169,7 @@ function confirmSlip(habitId) {
   _renderTodayChromeForFlip();
   renderNav();
   checkBadges();
-  showToast('Срыв записан · завтра новый шанс');
+  showToast('Slip logged · fresh start tomorrow');
 }
 
 function closeSlip(e) {
@@ -197,57 +197,57 @@ function openCreate(type) {
   const modal = document.getElementById('createModal');
   modal.innerHTML = `
     <div class="modal-title">
-      ${_createType === 'bad' ? 'Вредная привычка' : 'Новая привычка'}
+      ${_createType === 'bad' ? 'Bad habit' : 'New habit'}
     </div>
 
     <div class="field flex gap-8" style="margin-bottom:14px">
       <button type="button" class="btn ${_createType==='good'?'btn-primary':'btn-ghost'} full"
-              onclick="setCreateType('good')">Полезная</button>
+              onclick="setCreateType('good')">Good</button>
       <button type="button" class="btn ${_createType==='bad'?'btn-danger':'btn-ghost'} full"
-              onclick="setCreateType('bad')">Вредная</button>
+              onclick="setCreateType('bad')">Bad</button>
     </div>
 
     <div class="field">
-      <label class="field-label">Иконка</label>
+      <label class="field-label">Icon</label>
       <div id="iconGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
 
     <div class="field">
-      <label class="field-label">Название</label>
+      <label class="field-label">Name</label>
       <input class="field-input" id="createName"
-             placeholder="напр. Пробежка, Не курить...">
+             placeholder="e.g. Running, No smoking...">
     </div>
 
     <div class="field">
-      <label class="field-label">Категория</label>
+      <label class="field-label">Category</label>
       <div id="catGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
 
     <div class="field" id="scheduleField"
          ${_createType==='bad' ? 'style="display:none"' : ''}>
-      <label class="field-label">Расписание</label>
+      <label class="field-label">Schedule</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap" id="schedPresets">
         <button type="button" class="btn btn-primary btn-sm" data-preset="every"
-                onclick="setSchedule(this,'every')">Каждый день</button>
+                onclick="setSchedule(this,'every')">Every day</button>
         <button type="button" class="btn btn-ghost btn-sm" data-preset="weekdays"
-                onclick="setSchedule(this,'weekdays')">Будни</button>
+                onclick="setSchedule(this,'weekdays')">Weekdays</button>
         <button type="button" class="btn btn-ghost btn-sm" data-preset="weekend"
-                onclick="setSchedule(this,'weekend')">Выходные</button>
+                onclick="setSchedule(this,'weekend')">Weekend</button>
         <button type="button" class="btn btn-ghost btn-sm" data-preset="custom"
-                onclick="setSchedule(this,'custom')">Свои дни</button>
+                onclick="setSchedule(this,'custom')">Custom</button>
       </div>
       <div id="dayPicker" style="display:none;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
     </div>
 
     <div class="field">
-      <label class="field-label">Описание (необязательно)</label>
+      <label class="field-label">Description (optional)</label>
       <input class="field-input" id="createDesc"
-             placeholder="Зачем эта привычка?">
+             placeholder="Why this habit?">
     </div>
 
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closeCreate()">Отмена</button>
-      <button type="button" class="btn btn-primary" onclick="saveNewHabit()">Создать</button>
+      <button type="button" class="btn btn-ghost" onclick="closeCreate()">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="saveNewHabit()">Create</button>
     </div>`;
 
   _buildIconGrid();
@@ -270,66 +270,65 @@ function openEdit(habitId) {
 
   const modal = document.getElementById('createModal');
   modal.innerHTML = `
-    <div class="modal-title">Редактировать привычку</div>
+    <div class="modal-title">Edit habit</div>
 
     <div class="field">
-      <label class="field-label">Иконка</label>
+      <label class="field-label">Icon</label>
       <div id="iconGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
 
     <div class="field">
-      <label class="field-label">Название</label>
+      <label class="field-label">Name</label>
       <input class="field-input" id="createName"
              value="${esc(h.name)}"
-             placeholder="напр. Пробежка, Не курить...">
+             placeholder="e.g. Running, No smoking...">
     </div>
 
     <div class="field">
-      <label class="field-label">Категория</label>
+      <label class="field-label">Category</label>
       <div id="catGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
 
     <div class="field" id="scheduleField"
          ${h.bad ? 'style="display:none"' : ''}>
-      <label class="field-label">Расписание</label>
+      <label class="field-label">Schedule</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap" id="schedPresets">
         <button type="button" class="btn ${!h.schedule || h.schedule.length===0 ? 'btn-primary' : 'btn-ghost'} btn-sm"
-                onclick="setSchedule(this,'every')">Каждый день</button>
+                onclick="setSchedule(this,'every')">Every day</button>
         <button type="button" class="btn ${JSON.stringify(h.schedule)==='[0,1,2,3,4]' ? 'btn-primary' : 'btn-ghost'} btn-sm"
-                onclick="setSchedule(this,'weekdays')">Будни</button>
+                onclick="setSchedule(this,'weekdays')">Weekdays</button>
         <button type="button" class="btn ${JSON.stringify(h.schedule)==='[5,6]' ? 'btn-primary' : 'btn-ghost'} btn-sm"
-                onclick="setSchedule(this,'weekend')">Выходные</button>
+                onclick="setSchedule(this,'weekend')">Weekend</button>
         <button type="button" class="btn ${h.schedule && h.schedule.length>0 && JSON.stringify(h.schedule)!=='[0,1,2,3,4]' && JSON.stringify(h.schedule)!=='[5,6]' ? 'btn-primary' : 'btn-ghost'} btn-sm"
-                onclick="setSchedule(this,'custom')">Свои дни</button>
+                onclick="setSchedule(this,'custom')">Custom</button>
       </div>
       <div id="dayPicker" style="display:none;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
     </div>
 
     <div class="field">
-      <label class="field-label">Описание (необязательно)</label>
+      <label class="field-label">Description (optional)</label>
       <input class="field-input" id="createDesc"
              value="${esc(h.desc || '')}"
-             placeholder="Зачем эта привычка?">
+             placeholder="Why this habit?">
     </div>
 
     <div class="modal-footer">
       <button type="button" class="btn btn-ghost"
-              onclick="closeCreate()">Отмена</button>
+              onclick="closeCreate()">Cancel</button>
       <button type="button" class="btn btn-primary"
-              onclick="saveNewHabit()">Сохранить</button>
+              onclick="saveNewHabit()">Save</button>
     </div>`;
 
   _buildIconGrid();
   _buildCatGrid();
 
-  // Если свои дни — показываем пикер сразу
   if (h.schedule && h.schedule.length > 0 &&
       JSON.stringify(h.schedule) !== '[0,1,2,3,4]' &&
       JSON.stringify(h.schedule) !== '[5,6]') {
     const picker = document.getElementById('dayPicker');
     if (picker) {
       picker.style.display = 'flex';
-      const days = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+      const days = ['Mo','Tu','We','Th','Fr','Sa','Su'];
       days.forEach((d, i) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -369,7 +368,7 @@ function setSchedule(btn, preset) {
   if (preset === 'custom') {
     picker.style.display = 'flex';
     _createSchedule = _createSchedule && _createSchedule.length ? _createSchedule : [0,1,2,3,4,5,6];
-    const days = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+    const days = ['Mo','Tu','We','Th','Fr','Sa','Su'];
     picker.innerHTML = '';
     days.forEach((d, i) => {
       const b = document.createElement('button');
@@ -454,7 +453,7 @@ function saveNewHabit() {
       h.schedule = _createType === 'bad' ? null : _createSchedule;
       saveData();
       renderAll();
-      showToast('✓ «' + name + '» обновлена');
+      showToast('✓ «' + name + '» updated');
     }
     closeCreate();
     return;
@@ -481,7 +480,7 @@ function saveNewHabit() {
   closeCreate();
   // Обновляем именно текущий экран, чтобы новая привычка была видна сразу.
   renderAll();
-  showToast('✓ «' + name + '» добавлена');
+  showToast('✓ «' + name + '» added');
 }
 
 function closeCreate(e) {
@@ -497,19 +496,19 @@ function openDelete(habitId) {
   if (!h) return;
   const modal = document.getElementById('deleteModal');
   modal.innerHTML = `
-    <div class="modal-title">Удалить привычку</div>
+    <div class="modal-title">Delete habit</div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
       «${esc(h.name)}»<br>
       <span style="font-size:12px;color:var(--text3)">
-        Вся история будет удалена безвозвратно.
-        Лучше архивировать.
+        All history will be permanently deleted.
+        Consider archiving instead.
       </span>
     </p>
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost js-archive">В архив</button>
+      <button type="button" class="btn btn-ghost js-archive">Archive</button>
       <button type="button" class="btn btn-ghost"
-              onclick="closeDelete()">Отмена</button>
-      <button type="button" class="btn btn-danger js-delete">Удалить</button>
+              onclick="closeDelete()">Cancel</button>
+      <button type="button" class="btn btn-danger js-delete">Delete</button>
     </div>`;
   const ov = document.getElementById('deleteOverlay');
   ov.classList.add('open');
@@ -522,7 +521,7 @@ function confirmDelete(habitId) {
   saveData();
   closeDelete();
   renderAll();
-  showToast('Привычка удалена');
+  showToast('Habit deleted');
 }
 
 function archiveHabit(habitId) {
@@ -533,7 +532,7 @@ function archiveHabit(habitId) {
   saveData();
   closeDelete();
   renderAll();
-  showToast('«' + h.name + '» перемещена в архив');
+  showToast('«' + h.name + '» archived');
 }
 
 function restoreHabit(habitId) {
@@ -543,7 +542,7 @@ function restoreHabit(habitId) {
   habits   = [...habits, h];
   saveData();
   renderAll();
-  showToast('«' + h.name + '» восстановлена');
+  showToast('«' + h.name + '» restored');
 }
 
 function closeDelete(e) {
@@ -597,7 +596,7 @@ function exportData() {
   a.download = 'habitflow-backup-' + _todayKey() + '.json';
   a.click();
   URL.revokeObjectURL(a.href);
-  showToast('💾 Резервная копия сохранена');
+  showToast('💾 Backup saved');
 }
 
 function triggerImport() {
@@ -615,7 +614,7 @@ function importData(event) {
 
       // Проверка что файл похож на данные HabitFlow
       if (!d.habits && !d.archived && !d.earnedBadges) {
-        showToast('Файл не похож на резервную копию HabitFlow');
+        showToast('File does not look like a HabitFlow backup');
         event.target.value = '';
         return;
       }
@@ -626,10 +625,10 @@ function importData(event) {
 
       if (currentCount > 0) {
         const ok = confirm(
-          'Текущие данные будут заменены данными из файла.\n\n' +
-          'Сейчас: ' + currentCount + ' привычек\n' +
-          'В файле: ' + importCount  + ' привычек\n\n' +
-          'Продолжить?'
+          'Current data will be replaced with the data from the file.\n\n' +
+          'Current: ' + currentCount + ' habits\n' +
+          'In file: ' + importCount  + ' habits\n\n' +
+          'Continue?'
         );
         if (!ok) {
           event.target.value = '';
@@ -653,7 +652,7 @@ function importData(event) {
       _syncCleanTodaySetFromData();
       saveData();
       renderAll();
-      showToast('✓ Загружено: ' + habits.length + ' привычек');
+      showToast('✓ Loaded: ' + habits.length + ' habits');
 
     } catch (_err) {
       showToast('Error: file is corrupted or has an invalid format');
@@ -672,13 +671,13 @@ function _flipBadCard(habitId, state) {
   if (!card) return false;
   const bg   = state === 'clean' ? 'var(--accent)' : 'var(--bad)';
   const ico  = state === 'clean' ? '✓' : '✕';
-  const title = state === 'clean' ? 'Выдержал!' : 'Срыв записан';
+  const title = state === 'clean' ? 'Held strong!' : 'Slip logged';
   const h = habits.find(x => x.id === habitId);
   if (!h) return false;
   const streak = calcCleanStreakAt(h, _todayKey());
   const sub   = state === 'clean'
-    ? streak + ' чистых дней'
-    : 'Завтра новый шанс';
+    ? streak + ' clean days'
+    : 'Fresh start tomorrow';
   // Обновляем обратную сторону
   const back = card.querySelector('[data-face="back"]');
   if (back) {

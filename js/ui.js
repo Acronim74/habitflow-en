@@ -12,14 +12,14 @@ let _lastNetworkOnline = null;
 
 /** Короткие заголовки для строки прогресса (как в макете). */
 const _OB_HEADINGS = [
-  'ПРИВЕТСТВИЕ',
-  'ОТМЕТКИ',
-  'СОЗДАНИЕ ПРИВЫЧКИ',
-  'СЕРИИ И ОЧКИ',
-  'АНАЛИТИКА И ЗНАЧКИ',
-  'МЕНЮ НАСТРОЕК',
-  'УСТАНОВКА ПРИЛОЖЕНИЯ',
-  'ТВОИ ДАННЫЕ',
+  'WELCOME',
+  'TRACKING',
+  'CREATING A HABIT',
+  'STREAKS & POINTS',
+  'ANALYTICS & BADGES',
+  'SETTINGS MENU',
+  'INSTALL THE APP',
+  'YOUR DATA',
 ];
 
 function _updateTopBarMeta() {
@@ -29,22 +29,21 @@ function _updateTopBarMeta() {
   const legacyEl = document.getElementById('todayDate');
 
   const map = {
-    today: 'Сегодня',
-    habits: 'Привычки',
-    analytics: 'Аналитика',
-    badges: 'Значки',
+    today: 'Today',
+    habits: 'Habits',
+    analytics: 'Analytics',
+    badges: 'Badges',
   };
   const d = new Date();
-  const dateMain = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-  const dateWeek = d.toLocaleDateString('ru-RU', { weekday: 'long' });
+  const dateMain = d.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
+  const dateWeek = d.toLocaleDateString('en-US', { weekday: 'long' });
 
-  if (screenEl) screenEl.textContent = map[currentScreen] || 'Сегодня';
+  if (screenEl) screenEl.textContent = map[currentScreen] || 'Today';
   if (mainEl) mainEl.textContent = dateMain;
   if (weekEl) weekEl.textContent = dateWeek;
 
-  // Совместимость со старым id (если он где-то останется)
   if (legacyEl) {
-    legacyEl.textContent = d.toLocaleDateString('ru-RU', {
+    legacyEl.textContent = d.toLocaleDateString('en-US', {
       weekday: 'long', day: 'numeric', month: 'long',
     });
   }
@@ -179,18 +178,18 @@ function renderHabits() {
         <div class="flex" style="justify-content:space-between;
              align-items:center;margin-bottom:16px">
           <div>
-            <h1 style="font-size:20px;font-weight:500">Привычки</h1>
+            <h1 style="font-size:20px;font-weight:500">Habits</h1>
             <p style="font-size:12px;color:var(--text3);margin-top:2px">
-              ${habits.length} привычек · ${archived.length} в архиве
+              ${habits.length} habits · ${archived.length} archived
             </p>
           </div>
           <button type="button" class="btn btn-primary"
-                  onclick="openCreate('good')">+ Добавить</button>
+                  onclick="openCreate('good')">+ Add</button>
         </div>
 
         ${good.length > 0 ? `
           <div class="sec-header">
-            <span class="sec-label">Полезные</span>
+            <span class="sec-label">Good habits</span>
             <span class="sec-badge">${good.length}</span>
           </div>
           <div id="hgGoodList" style="display:flex;flex-direction:column;gap:8px">
@@ -198,7 +197,7 @@ function renderHabits() {
 
         ${bad.length > 0 ? `
           <div class="sec-header" style="margin-top:8px">
-            <span class="sec-label">Вредные</span>
+            <span class="sec-label">Bad habits</span>
             <span class="sec-badge bad">${bad.length}</span>
           </div>
           <div id="hgBadList" style="display:flex;flex-direction:column;gap:8px">
@@ -207,7 +206,7 @@ function renderHabits() {
         ${habits.length === 0 ? `
           <div style="text-align:center;padding:48px 0;color:var(--text3)">
             <div style="font-size:32px;margin-bottom:12px">🌿</div>
-            <div style="font-size:14px">Добавь первую привычку</div>
+            <div style="font-size:14px">Add your first habit</div>
           </div>` : ''}
 
         <!-- Дневник настроения -->
@@ -217,17 +216,17 @@ function renderHabits() {
                                     align-items:center">
             <div>
               <div style="font-size:14px;font-weight:500">
-                Дневник настроения
+                Mood journal
               </div>
               <div style="font-size:12px;color:var(--text3);margin-top:2px">
-                Отмечай настроение каждый день - видно в аналитике
+                Track your mood daily — visible in analytics
               </div>
             </div>
             <button type="button"
                     onclick="toggleMood()"
                     id="moodToggleBtn"
                     aria-pressed="${moodEnabled ? 'true' : 'false'}"
-                    aria-label="Дневник настроения"
+                    aria-label="Mood journal"
                     style="width:44px;height:24px;border-radius:12px;
                            border:none;cursor:pointer;
                            position:relative;transition:background .2s;
@@ -251,10 +250,10 @@ function renderHabits() {
                            border:none;cursor:pointer;padding:0;font-family:inherit">
               <div>
                 <div style="font-size:14px;font-weight:500;color:var(--text1)">
-                  Архив
+                  Archive
                 </div>
                 <div style="font-size:12px;color:var(--text3);margin-top:2px">
-                  ${archived.length} привычек
+                  ${archived.length} habits
                 </div>
               </div>
               <div id="archiveChevron"
@@ -312,7 +311,7 @@ function _buildArchivedCard(h) {
             ${esc(h.name)}
           </div>
           <div style="font-size:11px;color:var(--text3);margin-top:2px">
-            ${h.bad ? '🚫 Вредная' : '✅ Полезная'}
+            ${h.bad ? '🚫 Bad' : '✅ Good'}
             ${esc(scheduleLabel(h))}
           </div>
         </div>
@@ -321,13 +320,13 @@ function _buildArchivedCard(h) {
         <button type="button" class="btn btn-ghost"
                 style="font-size:12px;padding:5px 10px"
                 onclick="restoreHabit('${h.id}')">
-          Восстановить
+          Restore
         </button>
         <button type="button" class="btn btn-ghost"
                 style="font-size:12px;padding:5px 10px;color:var(--bad);
                        border-color:var(--bad-light)"
                 onclick="confirmDeleteArchived('${h.id}')">
-          Удалить
+          Delete
         </button>
       </div>
     </div>`;
@@ -337,12 +336,12 @@ function _buildArchivedCard(h) {
 function confirmDeleteArchived(habitId) {
   const h = archived.find(x => x.id === habitId);
   if (!h) return;
-  const ok = confirm('Удалить «' + h.name + '» из архива?\nВся история будет удалена безвозвратно.');
+  const ok = confirm('Delete «' + h.name + '» from archive?\nAll history will be permanently deleted.');
   if (!ok) return;
   archived = archived.filter(x => x.id !== habitId);
   saveData();
   renderHabits();
-  showToast('Привычка удалена из архива');
+  showToast('Habit deleted from archive');
 }
 
 function toggleMood() {
@@ -360,7 +359,7 @@ function toggleMood() {
     }
   }
 
-  showToast(moodEnabled ? '😊 Дневник настроения включён' : 'Дневник настроения выключен');
+  showToast(moodEnabled ? '😊 Mood journal enabled' : 'Mood journal disabled');
 }
 
 function toggleDayProgressWidget() {
@@ -372,8 +371,8 @@ function toggleDayProgressWidget() {
     dayProgressSection.classList.toggle('hidden', !dayProgressWidgetEnabled);
   }
   showToast(dayProgressWidgetEnabled
-    ? 'Карточка «Прогресс дня» на экране «Сегодня» включена'
-    : 'Карточка «Прогресс дня» скрыта');
+    ? 'Day progress widget enabled'
+    : 'Day progress widget hidden');
 }
 
 function toggleBestStreakWidget() {
@@ -385,8 +384,8 @@ function toggleBestStreakWidget() {
     streakBestSection.classList.toggle('hidden', !bestStreakWidgetEnabled);
   }
   showToast(bestStreakWidgetEnabled
-    ? 'Карточка «Личный рекорд» на экране «Сегодня» включена'
-    : 'Карточка «Личный рекорд» скрыта');
+    ? 'Personal best widget enabled'
+    : 'Personal best widget hidden');
 }
 
 function toggleSeriesWidget() {
@@ -398,8 +397,8 @@ function toggleSeriesWidget() {
     streakSeriesSection.classList.toggle('hidden', !seriesWidgetEnabled);
   }
   showToast(seriesWidgetEnabled
-    ? 'Карточка «Серия» на экране «Сегодня» включена'
-    : 'Карточка «Серия» скрыта');
+    ? 'Streak widget enabled'
+    : 'Streak widget hidden');
 }
 
 function _buildHabitManageCard(h) {
@@ -422,15 +421,15 @@ function _buildHabitManageCard(h) {
       <div class="flex gap-6">
         <button type="button" class="btn btn-ghost"
                 style="font-size:12px;padding:5px 10px"
-                onclick="openEdit('${h.id}')">Изменить</button>
+                onclick="openEdit('${h.id}')">Edit</button>
         <button type="button" class="btn btn-ghost"
                 style="font-size:12px;padding:5px 10px"
-                onclick="openDelete('${h.id}')">Удалить</button>
+                onclick="openDelete('${h.id}')">Delete</button>
       </div>
     </div>
     <div class="flex gap-12 mt-8" style="font-size:12px;color:var(--text3)">
-      <span>${h.bad ? '🛡️' : '🔥'} Личный рекорд: ${streak} дн.</span>
-      <span>🏆 Рекорд: ${best} дн.</span>
+      <span>${h.bad ? '🛡️' : '🔥'} Current streak: ${streak} d.</span>
+      <span>🏆 Best: ${best} d.</span>
     </div>`;
   return div;
 }
@@ -458,7 +457,7 @@ function renderAnalytics() {
   const statsValueStyle = isPhone
     ? 'font-size:18px;font-weight:500;line-height:1.1'
     : 'font-size:22px;font-weight:500';
-  const habitsKpiLabel = isPhone ? 'Привычек' : 'Всего привычек';
+  const habitsKpiLabel = isPhone ? 'Habits' : 'Total habits';
 
   screen.innerHTML = `
     <div class="page-grid">
@@ -467,26 +466,26 @@ function renderAnalytics() {
 
         <div style="display:flex;justify-content:space-between;
                     align-items:center;margin-bottom:16px">
-          <h1 style="font-size:20px;font-weight:500">Аналитика</h1>
+          <h1 style="font-size:20px;font-weight:500">Analytics</h1>
           <div style="display:flex;gap:4px" id="periodTabs">
             <button type="button" class="btn btn-sm ${_analyticsPeriod==='week'    ?'btn-primary':'btn-ghost'}"
-                    onclick="setAnalyticsPeriod('week')">Неделя</button>
+                    onclick="setAnalyticsPeriod('week')">Week</button>
             <button type="button" class="btn btn-sm ${_analyticsPeriod==='month'   ?'btn-primary':'btn-ghost'}"
-                    onclick="setAnalyticsPeriod('month')">Месяц</button>
+                    onclick="setAnalyticsPeriod('month')">Month</button>
             <button type="button" class="btn btn-sm ${_analyticsPeriod==='quarter' ?'btn-primary':'btn-ghost'}"
-                    onclick="setAnalyticsPeriod('quarter')">Квартал</button>
+                    onclick="setAnalyticsPeriod('quarter')">Quarter</button>
             <button type="button" class="btn btn-sm ${_analyticsPeriod==='year'    ?'btn-primary':'btn-ghost'}"
-                    onclick="setAnalyticsPeriod('year')">Год</button>
+                    onclick="setAnalyticsPeriod('year')">Year</button>
           </div>
         </div>
 
         <div style="${statsWrapStyle}">
           <div class="panel panel-body" style="${statsCardStyle}">
-            <div style="${statsLabelStyle}">Всего очков</div>
+            <div style="${statsLabelStyle}">Total points</div>
             <div style="${statsValueStyle}">${total.toLocaleString()}</div>
           </div>
           <div class="panel panel-body" style="${statsCardStyle}">
-            <div style="${statsLabelStyle}">За месяц</div>
+            <div style="${statsLabelStyle}">This month</div>
             <div style="${statsValueStyle}">${month.toLocaleString()}</div>
           </div>
           <div class="panel panel-body" style="${statsCardStyle}">
@@ -499,14 +498,14 @@ function renderAnalytics() {
           <div style="display:flex;gap:12px;align-items:stretch;flex-wrap:wrap">
         ${good.length > 0 ? `
           <div class="panel panel-body" style="flex:1 1 300px;min-width:0">
-            <div class="panel-title">Полезные привычки</div>
+            <div class="panel-title">Good habits</div>
             <div id="hmGoodWrap"></div>
             <div id="hmGoodStats" style="display:flex;gap:16px;margin-top:12px;
                  padding-top:12px;border-top:0.5px solid var(--border)"></div>
           </div>` : ''}
         ${bad.length > 0 ? `
           <div class="panel panel-body" style="flex:1 1 300px;min-width:0">
-            <div class="panel-title">Вредные привычки</div>
+            <div class="panel-title">Bad habits</div>
             <div id="hmBadWrap"></div>
             <div id="hmBadStats" style="display:flex;gap:16px;margin-top:12px;
                  padding-top:12px;border-top:0.5px solid var(--border)"></div>
@@ -515,7 +514,7 @@ function renderAnalytics() {
 
         ${moodEnabled ? `
           <div class="panel panel-body" style="margin-top:12px">
-            <div class="panel-title">Настроение</div>
+            <div class="panel-title">Mood</div>
             <div id="moodChartWrap"></div>
             <div id="moodChartStats"
                  style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;
@@ -526,7 +525,7 @@ function renderAnalytics() {
         ${habits.length === 0 ? `
           <div style="text-align:center;padding:48px 0;color:var(--text3)">
             <div style="font-size:32px;margin-bottom:12px">🌿</div>
-            <div>Добавь привычки для аналитики</div>
+            <div>Add habits to see analytics</div>
           </div>` : ''}
 
       </div>
@@ -612,9 +611,9 @@ function _renderHmGood() {
   const stats  = document.getElementById('hmGoodStats');
   if (!wrap) return;
 
-  const RU_MONTHS = ['Янв','Фев','Мар','Апр','Май','Июн',
-                     'Июл','Авг','Сен','Окт','Ноя','Дек'];
-  const DOW_SHORT = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const RU_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun',
+                     'Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DOW_SHORT = ['Mo','Tu','We','Th','Fr','Sa','Su'];
   const tk = _todayKey();
 
   function goodCellBg(pct) {
@@ -799,7 +798,7 @@ function _renderHmGood() {
           <div style="width:10px;height:10px;border-radius:2px;background:var(--accent2)"></div>
           <div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>
           <div style="width:10px;height:10px;border-radius:2px;background:var(--hm-lv4)"></div>
-          <span style="font-size:10px;color:var(--text4);margin-left:2px">меньше → больше</span>
+          <span style="font-size:10px;color:var(--text4);margin-left:2px">less → more</span>
         </div>`;
     } else {
     const s = new Date(TODAY);
@@ -861,7 +860,7 @@ function _renderHmGood() {
         <div style="width:10px;height:10px;border-radius:2px;background:var(--accent2)"></div>
         <div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>
         <div style="width:10px;height:10px;border-radius:2px;background:var(--hm-lv4)"></div>
-        <span style="font-size:10px;color:var(--text4);margin-left:2px">меньше → больше</span>
+        <span style="font-size:10px;color:var(--text4);margin-left:2px">less → more</span>
       </div>`;
     wrap.innerHTML = html;
     }
@@ -880,15 +879,15 @@ function _renderHmGood() {
   stats.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="font-size:16px;font-weight:500">${activeDays}</div>
-      <div style="font-size:10px;color:var(--text3)">активных дней</div>
+      <div style="font-size:10px;color:var(--text3)">active days</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="font-size:16px;font-weight:500">${perfectDays}</div>
-      <div style="font-size:10px;color:var(--text3)">идеальных дней</div>
+      <div style="font-size:10px;color:var(--text3)">perfect days</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="font-size:16px;font-weight:500">${avgPct}%</div>
-      <div style="font-size:10px;color:var(--text3)">средний % за период</div>
+      <div style="font-size:10px;color:var(--text3)">avg % for period</div>
     </div>`;
 }
 
@@ -901,9 +900,9 @@ function _renderHmBad() {
 
   const bad = habits.filter(h => h.bad);
   const N   = bad.length;
-  const RU_MONTHS = ['Янв','Фев','Мар','Апр','Май','Июн',
-                     'Июл','Авг','Сен','Окт','Ноя','Дек'];
-  const DOW_SHORT = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const RU_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun',
+                     'Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DOW_SHORT = ['Mo','Tu','We','Th','Fr','Sa','Su'];
   const tk = _todayKey();
 
   function buildStackCell(dk, size) {
@@ -933,7 +932,7 @@ function _renderHmBad() {
     return `<div style="width:${size}px;height:${size}px;border-radius:${size>12?5:2}px;
                          overflow:hidden;${outline}
                          display:flex;flex-direction:column;gap:1px;padding:${size>12?2:1}px;"
-                 title="${dk}: ${v.clean}/${N} чисто, ${v.slips} срыв">
+                 title="${dk}: ${v.clean}/${N} clean, ${v.slips} slips">
               ${strips}
             </div>`;
   }
@@ -952,7 +951,7 @@ function _renderHmBad() {
             ${DOW_SHORT[dowIdx]}
           </div>
           <div style="font-size:10px;color:var(--text3)">
-            ${v ? v.slips+' срыв' : '—'}
+            ${v ? v.slips+' slips' : '—'}
           </div>
         </div>`;
     });
@@ -1070,20 +1069,20 @@ function _renderHmBad() {
           <div style="display:flex;align-items:center;gap:4px">
             <div style="width:12px;height:12px;border-radius:2px;
                         background:#52b788"></div>
-            <span style="font-size:10px;color:var(--text4)">сдержался</span>
+            <span style="font-size:10px;color:var(--text4)">held</span>
           </div>
           <div style="display:flex;align-items:center;gap:4px">
             <div style="width:12px;height:12px;border-radius:2px;
                         background:var(--bad-light)"></div>
-            <span style="font-size:10px;color:var(--text4)">срыв</span>
+            <span style="font-size:10px;color:var(--text4)">slip</span>
           </div>
           <div style="display:flex;align-items:center;gap:4px">
             <div style="width:12px;height:12px;border-radius:2px;
                         background:var(--border)"></div>
-            <span style="font-size:10px;color:var(--text4)">не отмечено</span>
+            <span style="font-size:10px;color:var(--text4)">unmarked</span>
           </div>
           <span style="font-size:10px;color:var(--text4);margin-left:4px">
-            Каждая полоска = одна привычка
+            Each strip = one habit
           </span>
         </div>`;
     } else {
@@ -1128,20 +1127,20 @@ function _renderHmBad() {
         <div style="display:flex;align-items:center;gap:4px">
           <div style="width:12px;height:12px;border-radius:2px;
                       background:#52b788"></div>
-          <span style="font-size:10px;color:var(--text4)">сдержался</span>
+          <span style="font-size:10px;color:var(--text4)">held</span>
         </div>
         <div style="display:flex;align-items:center;gap:4px">
           <div style="width:12px;height:12px;border-radius:2px;
                       background:var(--bad-light)"></div>
-          <span style="font-size:10px;color:var(--text4)">срыв</span>
+          <span style="font-size:10px;color:var(--text4)">slip</span>
         </div>
         <div style="display:flex;align-items:center;gap:4px">
           <div style="width:12px;height:12px;border-radius:2px;
                       background:var(--border)"></div>
-          <span style="font-size:10px;color:var(--text4)">не отмечено</span>
+          <span style="font-size:10px;color:var(--text4)">unmarked</span>
         </div>
         <span style="font-size:10px;color:var(--text4);margin-left:4px">
-          Каждая полоска = одна привычка
+          Each strip = one habit
         </span>
       </div>`;
     wrap.innerHTML = html;
@@ -1163,15 +1162,15 @@ function _renderHmBad() {
   stats.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="font-size:16px;font-weight:500">${allSlips}</div>
-      <div style="font-size:10px;color:var(--text3)">срывов за период</div>
+      <div style="font-size:10px;color:var(--text3)">slips this period</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="font-size:16px;font-weight:500">${perfectDay}</div>
-      <div style="font-size:10px;color:var(--text3)">чистых дней</div>
+      <div style="font-size:10px;color:var(--text3)">clean days</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:2px">
-      <div style="font-size:16px;font-weight:500">${cleanStrk} дн.</div>
-      <div style="font-size:10px;color:var(--text3)">текущий Личный рекорд</div>
+      <div style="font-size:16px;font-weight:500">${cleanStrk} d.</div>
+      <div style="font-size:10px;color:var(--text3)">current streak</div>
     </div>`;
 }
 
@@ -1240,7 +1239,7 @@ function _renderMoodChart() {
       const [_, m, d] = dk.split('-').map(Number);
       const x = PAD_L + (dates.indexOf(dk) / Math.max(dates.length - 1, 1)) * chartW;
       const label = _analyticsPeriod === 'week'
-        ? ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'][(new Date(dk).getDay() + 6) % 7]
+        ? ['Mo','Tu','We','Th','Fr','Sa','Su'][(new Date(dk).getDay() + 6) % 7]
         : d + '.' + String(m).padStart(2, '0');
       return { x, label };
     });
@@ -1301,7 +1300,7 @@ function _renderMoodChart() {
       ${points.length === 0 ? `
         <text x="${W / 2}" y="${H / 2}" text-anchor="middle"
               font-size="11" fill="var(--text4)">
-          Нет данных за период
+          No data for this period
         </text>
       ` : ''}
     </svg>`;
@@ -1314,7 +1313,7 @@ function _renderMoodChart() {
   if (!stats) return;
   stats.innerHTML = recorded.length === 0
     ? `<span style="font-size:12px;color:var(--text3)">
-         Отмечай настроение каждый день - здесь появится статистика
+         Track your mood daily — stats will appear here
        </span>`
     : `
     <div style="display:flex;flex-direction:column;gap:2px">
@@ -1322,27 +1321,27 @@ function _renderMoodChart() {
         ${avgMood !== null ? _moodDotSvg(MOOD_COLORS[Math.round(avgMood)], 22) : '—'}
       </div>
       <div style="font-size:10px;color:var(--text3)">
-        среднее за период
+        avg for period
         ${avgMood !== null ? '(' + avgMood.toFixed(1) + '/4)' : ''}
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="font-size:16px;font-weight:500">${recorded.length}</div>
-      <div style="font-size:10px;color:var(--text3)">дней отмечено</div>
+      <div style="font-size:10px;color:var(--text3)">days tracked</div>
     </div>
     ${best !== null ? `
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="display:flex;align-items:center;min-height:22px">
         ${_moodDotSvg(MOOD_COLORS[best], 22)}
       </div>
-      <div style="font-size:10px;color:var(--text3)">лучший день</div>
+      <div style="font-size:10px;color:var(--text3)">best day</div>
     </div>` : ''}
     ${worst !== null && worst !== best ? `
     <div style="display:flex;flex-direction:column;gap:2px">
       <div style="display:flex;align-items:center;min-height:22px">
         ${_moodDotSvg(MOOD_COLORS[worst], 22)}
       </div>
-      <div style="font-size:10px;color:var(--text3)">тяжелый день</div>
+      <div style="font-size:10px;color:var(--text3)">hardest day</div>
     </div>` : ''}`;
 }
 
@@ -1360,10 +1359,10 @@ function renderBadges() {
       <div></div>
       <div>
         <h1 style="font-size:20px;font-weight:500;margin-bottom:4px">
-          Значки
+          Badges
         </h1>
         <p style="font-size:12px;color:var(--text3);margin-bottom:16px">
-          ${earnedBadges.length} получено · Стадия ${stageIdx + 1} из ${STAGES.length}
+          ${earnedBadges.length} earned · Stage ${stageIdx + 1} of ${STAGES.length}
         </p>
 
         <div class="panel panel-body" style="text-align:center;margin-bottom:12px">
@@ -1473,7 +1472,7 @@ function _obProgress() {
     dots += `<div class="ob-dot ${cls}"></div>`;
   }
   wrap.innerHTML = `
-    <div class="ob-progress-head">Шаг ${n} из ${_OB_TOTAL} — ${_OB_HEADINGS[_obStep]}</div>
+    <div class="ob-progress-head">Step ${n} of ${_OB_TOTAL} — ${_OB_HEADINGS[_obStep]}</div>
     <div class="ob-progress-bar">
       ${dots}
       <span class="ob-step-label">${n} / ${_OB_TOTAL}</span>
@@ -1495,23 +1494,23 @@ function _obFooterRender() {
   if (isFirst) {
     footer.innerHTML = `
       <button type="button" class="ob-btn-skip"
-              onclick="obSkip()">Пропустить</button>
+              onclick="obSkip()">Skip</button>
       <button type="button" class="ob-btn-next"
-              onclick="obNext()">Начать →</button>`;
+              onclick="obNext()">Start →</button>`;
   } else if (isLast) {
     footer.innerHTML = `
       <button type="button" class="ob-btn-back"
-              onclick="obPrev()">← Назад</button>
+              onclick="obPrev()">← Back</button>
       <button type="button" class="ob-btn-demo"
-              onclick="loadDemoData()">Демо-данные</button>
+              onclick="loadDemoData()">Demo data</button>
       <button type="button" class="ob-btn-next"
-              onclick="obSkip()">Начать!</button>`;
+              onclick="obSkip()">Get started!</button>`;
   } else {
     footer.innerHTML = `
       <button type="button" class="ob-btn-back"
-              onclick="obPrev()">← Назад</button>
+              onclick="obPrev()">← Back</button>
       <button type="button" class="ob-btn-next"
-              onclick="obNext()">Далее →</button>`;
+              onclick="obNext()">Next →</button>`;
   }
 }
 
@@ -1574,32 +1573,32 @@ function loadDemoData() {
   _syncCleanTodaySetFromData();
   saveData();
   obSkip();
-  showToast('Демо-данные загружены · добавь свои привычки!');
+  showToast('Demo data loaded · add your own habits!');
 }
 
 function _obSteps() {
   return [
 
     `<div class="ob-ico">🌿</div>
-     <div class="ob-title">Добро пожаловать в HabitFlow</div>
-     <div class="ob-text">Трекер привычек который работает полностью офлайн.
-       Твои данные хранятся только на этом устройстве — никаких серверов и подписок.</div>
+     <div class="ob-title">Welcome to HabitFlow</div>
+     <div class="ob-text">A habit tracker that works fully offline.
+       Your data is stored only on this device — no servers, no subscriptions.</div>
      <div class="ob-hint">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">За минуту покажем как всё устроено.
-         Или сразу начни — всё интуитивно.</div>
+       <div class="ob-hint-text">We'll show you how everything works in a minute.
+         Or just dive in — it's all intuitive.</div>
      </div>`,
 
     `<div class="ob-ico">✅</div>
-     <div class="ob-title">Отмечай привычки</div>
-     <div class="ob-text">Нажми кнопку справа — карточка перевернётся и
-       покажет время выполнения. Нажми «отменить» чтобы снять отметку.</div>
+     <div class="ob-title">Track your habits</div>
+     <div class="ob-text">Tap the button on the right — the card will flip and
+       show the time you checked in. Tap "undo" to remove the check.</div>
      <div class="ob-preview">
        <div class="ob-card-front">
          <div class="ob-card-row">
            <div class="ob-card-body">
-             <div class="ob-card-name">🏃 Утренняя пробежка</div>
-             <div class="ob-card-sub">Начни серию сегодня</div>
+             <div class="ob-card-name">🏃 Morning run</div>
+             <div class="ob-card-sub">Start your streak today</div>
            </div>
            <div class="ob-card-check">
              <div class="ob-card-btn"></div>
@@ -1610,34 +1609,34 @@ function _obSteps() {
        <div class="ob-card-back">
          <div class="ob-card-back-ico">✓</div>
          <div>
-           <div class="ob-card-back-title">Выполнено!</div>
+           <div class="ob-card-back-title">Done!</div>
            <div class="ob-card-back-time">07:24</div>
          </div>
-         <div class="ob-card-back-undo">отменить</div>
+         <div class="ob-card-back-undo">undo</div>
        </div>
      </div>
      <div class="ob-hint">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Для вредных привычек — две кнопки:
-         ✓ Выдержал или ✕ Был срыв.</div>
+       <div class="ob-hint-text">For bad habits — two buttons:
+         ✓ Held strong or ✕ Had a slip.</div>
      </div>`,
 
     `<div class="ob-ico-plus" aria-hidden="true">+</div>
-     <div class="ob-title">Как создать привычку</div>
-     <div class="ob-text">Нажми «Добавить привычку» — откроется форма. Вот что в ней есть:</div>
+     <div class="ob-title">How to create a habit</div>
+     <div class="ob-text">Tap "Add habit" — a form will open. Here's what's in it:</div>
      <div class="ob-preview ob-preview-create">
-       <div class="ob-preview-label">Тип привычки</div>
+       <div class="ob-preview-label">Habit type</div>
        <div class="ob-type-row">
          <div class="ob-type-btn good">
            <span class="ob-type-glyph" aria-hidden="true">✓</span>
-           Полезная
+           Good
          </div>
          <div class="ob-type-btn bad">
            <span class="ob-type-glyph" aria-hidden="true">🚫</span>
-           Вредная
+           Bad
          </div>
        </div>
-       <div class="ob-preview-label">Иконка</div>
+       <div class="ob-preview-label">Icon</div>
        <div class="ob-icon-row">
          <div class="ob-icon-btn sel">🏃</div>
          <div class="ob-icon-btn">📚</div>
@@ -1648,152 +1647,149 @@ function _obSteps() {
          <div class="ob-icon-btn">🚫</div>
          <div class="ob-icon-btn">🚬</div>
        </div>
-       <div class="ob-preview-label">Название</div>
-       <div class="ob-field ob-field-placeholder">Утренняя пробежка</div>
-       <div class="ob-preview-label">Расписание</div>
+       <div class="ob-preview-label">Name</div>
+       <div class="ob-field ob-field-placeholder">Morning run</div>
+       <div class="ob-preview-label">Schedule</div>
        <div class="ob-sched-row">
-         <div class="ob-sched-btn sel">Каждый день</div>
-         <div class="ob-sched-btn">Будни</div>
-         <div class="ob-sched-btn">Выходные</div>
-         <div class="ob-sched-btn">Свои дни</div>
+         <div class="ob-sched-btn sel">Every day</div>
+         <div class="ob-sched-btn">Weekdays</div>
+         <div class="ob-sched-btn">Weekend</div>
+         <div class="ob-sched-btn">Custom</div>
        </div>
      </div>
      <div class="ob-hint">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Расписание влияет на прогресс дня. Привычка «Будни»
-         не считается пропуском в выходной — но её можно отметить как бонус.</div>
+       <div class="ob-hint-text">Schedule affects day progress. A "Weekdays" habit
+         doesn't count as missed on weekends — but you can still mark it as a bonus.</div>
      </div>
      <div class="ob-hint">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Для вредных привычек расписание недоступно — они
-         отслеживаются каждый день.</div>
+       <div class="ob-hint-text">Bad habits don't have a schedule — they are
+         tracked every day.</div>
      </div>`,
 
     `<div class="ob-ico">🔥</div>
-     <div class="ob-title">Серии и очки</div>
-     <div class="ob-text">Каждая отметка приносит очки.
-       Чем дольше серия — тем больше множитель.</div>
+     <div class="ob-title">Streaks &amp; points</div>
+     <div class="ob-text">Every check earns points.
+       The longer the streak — the bigger the multiplier.</div>
      <div class="ob-pts-row">
-       <span class="ob-pts-pill good">Полезная +10 pts</span>
-       <span class="ob-pts-pill bad">Вредная +5 pts</span>
-       <span class="ob-pts-pill bonus">Бонус +10 pts</span>
+       <span class="ob-pts-pill good">Good +10 pts</span>
+       <span class="ob-pts-pill bad">Bad +5 pts</span>
+       <span class="ob-pts-pill bonus">Bonus +10 pts</span>
      </div>
      <div class="ob-mult-card">
-       7+ дней подряд → <strong style="color:var(--accent)">×2</strong><br>
-       30+ дней подряд → <strong style="color:var(--accent)">×3</strong><br>
-       100+ дней подряд → <strong style="color:var(--accent)">×5</strong>
+       7+ days in a row → <strong style="color:var(--accent)">×2</strong><br>
+       30+ days in a row → <strong style="color:var(--accent)">×3</strong><br>
+       100+ days in a row → <strong style="color:var(--accent)">×5</strong>
      </div>
      <div class="ob-hint" style="margin-top:10px">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Закрыл все запланированные привычки за день —
-         дополнительно +25 pts.</div>
+       <div class="ob-hint-text">Complete all habits for the day —
+         bonus +25 pts.</div>
      </div>`,
 
     `<div class="ob-ico">📊</div>
-     <div class="ob-title">Аналитика и значки</div>
-     <div class="ob-text">В аналитике — тепловые карты за неделю, месяц,
-       квартал или год. В значках — твой персонаж растёт по мере
-       накопления очков.</div>
+     <div class="ob-title">Analytics &amp; badges</div>
+     <div class="ob-text">Analytics shows heatmaps for the week, month,
+       quarter or year. In badges — your character grows as you earn points.</div>
      <div class="ob-badge-row">
        <div class="ob-badge-item">
          <div class="ob-badge-ico">🔥</div>
-         <div class="ob-badge-lbl">Первый огонь</div>
+         <div class="ob-badge-lbl">First Fire</div>
        </div>
        <div class="ob-badge-item">
          <div class="ob-badge-ico">💎</div>
-         <div class="ob-badge-lbl">Бриллиант</div>
+         <div class="ob-badge-lbl">Diamond</div>
        </div>
        <div class="ob-badge-item">
          <div class="ob-badge-ico locked">🏆</div>
-         <div class="ob-badge-lbl">Чемпион</div>
+         <div class="ob-badge-lbl">Champion</div>
        </div>
        <div class="ob-badge-item">
          <div class="ob-badge-ico locked">⚡</div>
-         <div class="ob-badge-lbl">Центурион</div>
+         <div class="ob-badge-lbl">Centurion</div>
        </div>
        <div class="ob-badge-item">
          <div class="ob-badge-ico locked">🍀</div>
-         <div class="ob-badge-lbl">Удача</div>
+         <div class="ob-badge-lbl">Lucky</div>
        </div>
      </div>
      <div class="ob-hint">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Стадии: Начало → В ритме → Устойчивость →
-         Сила привычки → Опора → Мастер</div>
+       <div class="ob-hint-text">Stages: Beginner → In the Flow → Steady →
+         Habit Force → Pillar → Master</div>
      </div>`,
 
-    // ── Шаг 6: Меню настроек ──
     `<div class="ob-ico">☰</div>
-     <div class="ob-title">Меню настроек</div>
-     <div class="ob-text">Нажми кнопку ☰ в правом верхнем углу —
-       откроется меню с настройками приложения.</div>
+     <div class="ob-title">Settings menu</div>
+     <div class="ob-text">Tap the ☰ button in the top-right corner —
+       the app settings menu will open.</div>
      <div class="ob-data-row">
        <div class="ob-data-ico">🎨</div>
-       <div class="ob-data-text">Тема — четыре варианта оформления:
-         светлая, тёмная, Трон и Blade Runner</div>
+       <div class="ob-data-text">Theme — four options:
+         Light, Dark, Tron and Blade Runner</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">📊</div>
-       <div class="ob-data-text">Виджеты — включай и выключай карточки
-         прогресса, Личного рекорда и настроения</div>
+       <div class="ob-data-text">Widgets — toggle progress, personal best
+         and mood cards on or off</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">💾</div>
-       <div class="ob-data-text">Данные — экспорт и импорт резервных копий</div>
+       <div class="ob-data-text">Data — export and import backup files</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">🎓</div>
-       <div class="ob-data-text">Знакомство — повторно открыть этот тур
-         в любой момент</div>
+       <div class="ob-data-text">Tour — reopen this tour
+         at any time</div>
      </div>`,
 
-    // ── Шаг 7: Установка на телефон или ПК ──
     `<div class="ob-ico">📲</div>
-     <div class="ob-title">Установи как приложение</div>
-     <div class="ob-text">HabitFlow можно установить на телефон или компьютер —
-       будет работать как обычное приложение без браузерной строки.</div>
+     <div class="ob-title">Install as an app</div>
+     <div class="ob-text">HabitFlow can be installed on your phone or desktop —
+       it works like a native app without a browser bar.</div>
      <div class="ob-data-row">
        <div class="ob-data-ico">🤖</div>
-       <div class="ob-data-text"><b>Android:</b> открой в Chrome →
-         меню ⋮ → «Добавить на главный экран»</div>
+       <div class="ob-data-text"><b>Android:</b> open in Chrome →
+         menu ⋮ → "Add to Home Screen"</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">🍎</div>
-       <div class="ob-data-text"><b>iPhone:</b> открой в Safari →
-         кнопка «Поделиться» → «На экран Домой»</div>
+       <div class="ob-data-text"><b>iPhone:</b> open in Safari →
+         Share button → "Add to Home Screen"</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">💻</div>
-       <div class="ob-data-text"><b>ПК (Chrome/Edge):</b> нажми иконку
-         установки в адресной строке справа →
-         «Установить»</div>
+       <div class="ob-data-text"><b>Desktop (Chrome/Edge):</b> tap the install
+         icon in the address bar →
+         "Install"</div>
      </div>
      <div class="ob-hint" style="margin-top:8px">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">После установки приложение работает
-         полностью офлайн — данные хранятся на устройстве.</div>
+       <div class="ob-hint-text">Once installed, the app works
+         fully offline — data stays on your device.</div>
      </div>`,
 
     `<div class="ob-ico">💾</div>
-     <div class="ob-title">Твои данные в безопасности</div>
-     <div class="ob-text">Всё хранится локально на этом устройстве.
-       Делай резервные копии через кнопки в навбаре.</div>
+     <div class="ob-title">Your data is safe</div>
+     <div class="ob-text">Everything is stored locally on this device.
+       Use the backup buttons in the menu to save copies.</div>
      <div class="ob-data-row">
        <div class="ob-data-ico">💾</div>
-       <div class="ob-data-text">Экспорт — скачать резервную копию (.json)</div>
+       <div class="ob-data-text">Export — download a backup file (.json)</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">📂</div>
-       <div class="ob-data-text">Импорт — восстановить из файла</div>
+       <div class="ob-data-text">Import — restore from a file</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">❓</div>
-       <div class="ob-data-text">Помощь — полная документация</div>
+       <div class="ob-data-text">Help — full documentation</div>
      </div>
      <div class="ob-hint" style="margin-top:4px">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Попробуй демо-данные чтобы увидеть приложение
-         в действии — их можно удалить в любой момент.</div>
+       <div class="ob-hint-text">Try the demo data to see the app
+         in action — you can delete it any time.</div>
      </div>`,
   ];
 }
@@ -1805,100 +1801,100 @@ const GUIDE_MODAL_HTML = `
 <div class="wrap">
 
   <h1>🌿 HabitFlow</h1>
-  <p class="subtitle">Офлайн-трекер привычек · данные хранятся только на этом устройстве</p>
+  <p class="subtitle">Offline habit tracker · data stored only on this device</p>
 
-  <h2>Экраны приложения</h2>
+  <h2>App screens</h2>
 
   <div class="card">
-    <div class="card-title">☀️ Сегодня</div>
-    <p>Главный экран. Показывает прогресс дня, карточки привычек и статистику.
-    Отмечай привычки здесь — карточка перевернётся и покажет время выполнения.</p>
+    <div class="card-title">☀️ Today</div>
+    <p>Main screen. Shows day progress, habit cards and stats.
+    Check off habits here — the card flips to show the completion time.</p>
   </div>
 
   <div class="card">
-    <div class="card-title">✅ Привычки</div>
-    <p>Список всех привычек. Здесь можно добавить новую, отправить в архив или удалить.
-    Также здесь включается и выключается дневник настроения.</p>
+    <div class="card-title">✅ Habits</div>
+    <p>List of all habits. Add new ones, archive or delete them here.
+    The mood journal is also toggled from this screen.</p>
   </div>
 
   <div class="card">
-    <div class="card-title">📊 Аналитика</div>
-    <p>Тепловые карты активности за неделю, месяц, квартал или год.
-    Отдельные карты для полезных и вредных привычек.
-    Если включён дневник настроения — появится линейный график настроения.</p>
+    <div class="card-title">📊 Analytics</div>
+    <p>Activity heatmaps for the week, month, quarter or year.
+    Separate maps for good and bad habits.
+    If the mood journal is on — a mood line chart appears too.</p>
   </div>
 
   <div class="card">
-    <div class="card-title">🏅 Значки</div>
-    <p>Твой персонаж и достижения. Стадии развития: Начало → В ритме → Устойчивость →
-    Сила привычки → Опора → Мастер. Значки получаешь за конкретные результаты.</p>
+    <div class="card-title">🏅 Badges</div>
+    <p>Your character and achievements. Stages: Beginner → In the Flow → Steady →
+    Habit Force → Pillar → Master. Earn badges for specific milestones.</p>
   </div>
 
-  <h2>Типы привычек</h2>
+  <h2>Habit types</h2>
 
   <div class="card">
-    <span class="tag tag-good">Полезная</span>
-    <p>Нажми кнопку справа — карточка перевернётся. Показывает время отметки и кнопку
-    «отменить». Отмечай каждый день чтобы наращивать серию.</p>
+    <span class="tag tag-good">Good</span>
+    <p>Tap the button on the right — the card flips. Shows the check-in time and an
+    "undo" button. Check in every day to build a streak.</p>
     <div class="divider"></div>
-    <p><span class="pts">+10 pts</span> за каждую отметку &nbsp;·&nbsp;
-    <span class="pts">+25 pts</span> если закрыл все запланированные за день</p>
+    <p><span class="pts">+10 pts</span> per check &nbsp;·&nbsp;
+    <span class="pts">+25 pts</span> if you complete all habits for the day</p>
   </div>
 
   <div class="card">
-    <span class="tag tag-bad">Вредная</span>
-    <p>Две кнопки: ✓ Выдержал или ✕ Был срыв. После нажатия карточка перевернётся —
-    зелёная если выдержал, красная если был срыв. Нажми на цвет чтобы отменить.</p>
+    <span class="tag tag-bad">Bad</span>
+    <p>Two buttons: ✓ Held strong or ✕ Had a slip. The card flips —
+    green if you held, red if you slipped. Tap the color to undo.</p>
     <div class="divider"></div>
-    <p><span class="pts">+5 pts</span> за чистый день · при срыве очки не начисляются</p>
+    <p><span class="pts">+5 pts</span> for a clean day · no points for a slip</p>
   </div>
 
   <div class="card">
-    <span class="tag tag-bonus">Бонусная</span>
-    <p>Полезная привычка с расписанием (например «Будни»). В выходной она становится
-    бонусной — можно отметить добровольно и получить дополнительные очки.</p>
+    <span class="tag tag-bonus">Bonus</span>
+    <p>A good habit with a schedule (e.g. "Weekdays"). On off-days it becomes
+    a bonus — you can check it voluntarily and earn extra points.</p>
     <div class="divider"></div>
-    <p><span class="pts">+10 pts</span> за бонусную отметку</p>
+    <p><span class="pts">+10 pts</span> for a bonus check</p>
   </div>
 
-  <h2>Серии и множители</h2>
+  <h2>Streaks &amp; multipliers</h2>
 
   <div class="card">
-    <p>Чем дольше серия — тем больше очков за каждую отметку:</p>
+    <p>The longer the streak — the more points per check:</p>
     <ul style="margin-top: 8px;">
-      <li>7+ дней подряд: <span class="pts">×2</span></li>
-      <li>30+ дней подряд: <span class="pts">×3</span></li>
-      <li>100+ дней подряд: <span class="pts">×5</span></li>
+      <li>7+ days in a row: <span class="pts">×2</span></li>
+      <li>30+ days in a row: <span class="pts">×3</span></li>
+      <li>100+ days in a row: <span class="pts">×5</span></li>
     </ul>
   </div>
 
-  <h2>Расписание</h2>
+  <h2>Schedule</h2>
 
   <div class="card">
-    <p>При создании привычки можно выбрать расписание: каждый день, будни, выходные
-    или свои дни. В дни когда привычка не запланирована — она не влияет на прогресс,
-    но её всё равно можно отметить как бонусную.</p>
+    <p>When creating a habit you can pick a schedule: every day, weekdays, weekend
+    or custom days. On days the habit isn't scheduled — it doesn't affect progress,
+    but you can still check it in as a bonus.</p>
   </div>
 
-  <h2>Данные и резервные копии</h2>
+  <h2>Data &amp; backups</h2>
 
   <div class="card">
-    <p>Данные хранятся в браузере на этом устройстве. Если очистить данные браузера —
-    история может быть потеряна.</p>
+    <p>Data is stored in the browser on this device. If you clear browser data —
+    history may be lost.</p>
     <div class="divider"></div>
-    <p>💾 <strong>Экспорт</strong> — скачивает файл резервной копии (.json)<br>
-    📂 <strong>Импорт</strong> — загружает ранее сохранённый файл.<br>
-    Делай резервные копии регулярно, особенно перед обновлением браузера.</p>
+    <p>💾 <strong>Export</strong> — downloads a backup file (.json)<br>
+    📂 <strong>Import</strong> — loads a previously saved file.<br>
+    Back up regularly, especially before updating the browser.</p>
   </div>
 
-  <h2>Темы оформления</h2>
+  <h2>Themes</h2>
 
   <div class="card">
-    <p>Переключатель тем находится в навбаре рядом с аватаром.
-    Доступны четыре темы: ☀️ Светлая, 🌙 Тёмная, ◈ Трон, ◉ Blade Runner.</p>
+    <p>The theme switcher is in the menu next to the avatar.
+    Four themes available: ☀️ Light, 🌙 Dark, ◈ Tron, ◉ Blade Runner.</p>
   </div>
 
-  <p class="footer">HabitFlow · работает полностью офлайн</p>
+  <p class="footer">HabitFlow · works fully offline</p>
 
 </div>
 `;
