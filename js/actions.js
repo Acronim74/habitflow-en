@@ -143,8 +143,8 @@ function openSlip(habitId) {
       <button type="button" class="btn btn-ghost" onclick="closeSlip()">Отмена</button>
       <button type="button" class="btn btn-danger">Записать срыв</button>
     </div>`;
-  modal.querySelector('.btn-danger').addEventListener('click', () => confirmSlip(habitId));
   document.getElementById('slipOverlay').classList.add('open');
+  modal.querySelector('.btn-danger').addEventListener('click', () => confirmSlip(habitId));
 }
 
 function confirmSlip(habitId) {
@@ -511,9 +511,10 @@ function openDelete(habitId) {
               onclick="closeDelete()">Отмена</button>
       <button type="button" class="btn btn-danger js-delete">Удалить</button>
     </div>`;
-  modal.querySelector('.js-archive').addEventListener('click', () => archiveHabit(h.id));
-  modal.querySelector('.js-delete').addEventListener('click', () => confirmDelete(h.id));
-  document.getElementById('deleteOverlay').classList.add('open');
+  const ov = document.getElementById('deleteOverlay');
+  ov.classList.add('open');
+  ov.querySelector('.js-archive').addEventListener('click', () => archiveHabit(h.id));
+  ov.querySelector('.js-delete').addEventListener('click', () => confirmDelete(h.id));
 }
 
 function confirmDelete(habitId) {
@@ -550,6 +551,31 @@ function closeDelete(e) {
   document.getElementById('deleteOverlay').classList.remove('open');
 }
 
+// ── Валидация импортируемых привычек ──────
+
+function _sanitizeHabit(h) {
+  if (!h || typeof h !== 'object') return null;
+  const id = (typeof h.id === 'string' && /^[\w-]{1,64}$/.test(h.id)) ? h.id : _uuid();
+  const schedule = Array.isArray(h.schedule)
+    ? h.schedule.filter(n => Number.isInteger(n) && n >= 0 && n <= 6)
+    : null;
+  return {
+    id,
+    name:      typeof h.name === 'string'     ? h.name.slice(0, 200)     : '',
+    icon:      typeof h.icon === 'string'     ? h.icon.slice(0, 10)      : (h.bad ? '🚫' : '⭐'),
+    category:  typeof h.category === 'string' ? h.category.slice(0, 50)  : '',
+    desc:      typeof h.desc === 'string'     ? h.desc.slice(0, 500)     : '',
+    bad:       !!h.bad,
+    schedule:  schedule && schedule.length > 0 ? schedule : null,
+    checks:    (h.checks  && typeof h.checks  === 'object') ? h.checks  : {},
+    slips:     (h.slips   && typeof h.slips   === 'object') ? h.slips   : {},
+    clean:     (h.clean   && typeof h.clean   === 'object') ? h.clean   : {},
+    times:     (h.times   && typeof h.times   === 'object') ? h.times   : {},
+    notes:     (h.notes   && typeof h.notes   === 'object') ? h.notes   : {},
+    createdAt: typeof h.createdAt === 'string' ? h.createdAt : '',
+  };
+}
+
 // ── Экспорт / Импорт ─────────────────────
 
 function exportData() {
@@ -576,29 +602,6 @@ function exportData() {
 
 function triggerImport() {
   document.getElementById('importFile').click();
-}
-
-function _sanitizeHabit(h) {
-  if (!h || typeof h !== 'object') return null;
-  const id = (typeof h.id === 'string' && /^[\w-]{1,64}$/.test(h.id)) ? h.id : _uuid();
-  const schedule = Array.isArray(h.schedule)
-    ? h.schedule.filter(n => Number.isInteger(n) && n >= 0 && n <= 6)
-    : null;
-  return {
-    id,
-    name:      typeof h.name === 'string'     ? h.name.slice(0, 200)     : '',
-    icon:      typeof h.icon === 'string'     ? h.icon.slice(0, 10)      : (h.bad ? '🚫' : '⭐'),
-    category:  typeof h.category === 'string' ? h.category.slice(0, 50)  : '',
-    desc:      typeof h.desc === 'string'     ? h.desc.slice(0, 500)     : '',
-    bad:       !!h.bad,
-    schedule:  schedule && schedule.length > 0 ? schedule : null,
-    checks:    (h.checks  && typeof h.checks  === 'object') ? h.checks  : {},
-    slips:     (h.slips   && typeof h.slips   === 'object') ? h.slips   : {},
-    clean:     (h.clean   && typeof h.clean   === 'object') ? h.clean   : {},
-    times:     (h.times   && typeof h.times   === 'object') ? h.times   : {},
-    notes:     (h.notes   && typeof h.notes   === 'object') ? h.notes   : {},
-    createdAt: typeof h.createdAt === 'string' ? h.createdAt : '',
-  };
 }
 
 function importData(event) {
@@ -653,7 +656,7 @@ function importData(event) {
       showToast('✓ Загружено: ' + habits.length + ' привычек');
 
     } catch (_err) {
-      showToast('Ошибка: файл повреждён или имеет неверный формат');
+      showToast('Error: file is corrupted or has an invalid format');
     }
 
     event.target.value = '';

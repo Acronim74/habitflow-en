@@ -16,15 +16,15 @@
 </head>
 <body>
 
+<canvas id="confCanvas"></canvas>
+
 <div id="iosInAppBanner" class="ios-inapp-banner" hidden role="alert">
   <div class="ios-inapp-banner-inner">
     <p class="ios-inapp-banner-msg" id="iosInAppBannerMsg"></p>
     <button type="button" class="ios-inapp-banner-close"
-            onclick="dismissIOSInAppBanner()" aria-label="Закрыть">×</button>
+            onclick="dismissIOSInAppBanner()" aria-label="Close">×</button>
   </div>
 </div>
-
-<canvas id="confCanvas"></canvas>
 
 <!-- ════════════ ОНБОРДИНГ-МАСТЕР ════════════ -->
 <div class="ob-overlay" id="onboardingScreen">
@@ -105,17 +105,17 @@
           <button type="button" class="theme-btn active"
                   data-theme="light" onclick="setTheme('light')">
             <span class="theme-btn-ico">☀️</span>
-            <span class="theme-btn-label">Светлая</span>
+            <span class="theme-btn-label">Light</span>
           </button>
           <button type="button" class="theme-btn"
                   data-theme="dark" onclick="setTheme('dark')">
             <span class="theme-btn-ico">🌙</span>
-            <span class="theme-btn-label">Тёмная</span>
+            <span class="theme-btn-label">Dark</span>
           </button>
           <button type="button" class="theme-btn"
                   data-theme="tron" onclick="setTheme('tron')">
             <span class="theme-btn-ico">◈</span>
-            <span class="theme-btn-label">Трон</span>
+            <span class="theme-btn-label">Tron</span>
           </button>
           <button type="button" class="theme-btn"
                   data-theme="blade" onclick="setTheme('blade')">
@@ -183,20 +183,20 @@
 
       <!-- Прочее -->
       <div class="burger-section">
+        <button type="button" class="burger-item" id="pwaInstallBtn"
+                onclick="closeBurger();pwaTryInstall()">
+          <span class="burger-item-ico">📲</span>
+          <span>Install app</span>
+        </button>
         <button type="button" class="burger-item"
                 onclick="openOnboarding();closeBurger()">
           <span class="burger-item-ico">🎓</span>
-          <span>Знакомство с приложением</span>
-        </button>
-        <button type="button" class="burger-item"
-                onclick="closeBurger();pwaTryInstall()">
-          <span class="burger-item-ico">📲</span>
-          <span>Установить приложение</span>
+          <span>App tutorial</span>
         </button>
         <button type="button" class="burger-item"
                 onclick="openGuide();closeBurger()">
           <span class="burger-item-ico">❓</span>
-          <span>Помощь</span>
+          <span>Help</span>
         </button>
       </div>
 
@@ -258,7 +258,7 @@
               <div id="gaugePct" class="gauge-pct">0%</div>
             </div>
           </div>
-          <div id="donutMeta" class="gauge-meta">0 из 0</div>
+          <div id="donutMeta" class="gauge-meta">0 of 0</div>
         </div>
 
         <!-- Личный рекорд (дней подряд; между прогрессом и серией) -->

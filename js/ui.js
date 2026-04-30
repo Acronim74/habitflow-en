@@ -1,24 +1,14 @@
 // ── Навигация ─────────────────────────────
 
+/** PWA install prompt (Chrome, Edge, Samsung Internet). One-shot. */
+let _deferredInstallPrompt = null;
+/** Show our own message right after install (tab not yet in standalone). */
+let _pwaInstalledThisSession = false;
+
 let _obStep = 0;
 const _OB_TOTAL = 8;
 const _ONBOARDING_DONE_KEY = 'habitflow_onboarding_done';
 let _lastNetworkOnline = null;
-
-/** Событие установки PWA (Chrome, Edge, Samsung Internet и др.). Одноразовое. */
-let _deferredInstallPrompt = null;
-/** Сразу после установки вкладка ещё не в standalone — показываем своё сообщение. */
-let _pwaInstalledThisSession = false;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  _deferredInstallPrompt = e;
-  document.dispatchEvent(new CustomEvent('habitflow-install-available'));
-});
-window.addEventListener('appinstalled', () => {
-  _deferredInstallPrompt = null;
-  _pwaInstalledThisSession = true;
-  document.dispatchEvent(new CustomEvent('habitflow-install-done'));
-});
 
 /** Короткие заголовки для строки прогресса (как в макете). */
 const _OB_HEADINGS = [
@@ -329,19 +319,18 @@ function _buildArchivedCard(h) {
       </div>
       <div class="flex gap-6">
         <button type="button" class="btn btn-ghost"
-                style="font-size:12px;padding:5px 10px">
+                style="font-size:12px;padding:5px 10px"
+                onclick="restoreHabit('${h.id}')">
           Восстановить
         </button>
         <button type="button" class="btn btn-ghost"
                 style="font-size:12px;padding:5px 10px;color:var(--bad);
-                       border-color:var(--bad-light)">
+                       border-color:var(--bad-light)"
+                onclick="confirmDeleteArchived('${h.id}')">
           Удалить
         </button>
       </div>
     </div>`;
-  const [restoreBtn, delBtn] = div.querySelectorAll('.flex.gap-6 .btn');
-  restoreBtn.addEventListener('click', () => restoreHabit(h.id));
-  delBtn.addEventListener('click', () => confirmDeleteArchived(h.id));
   return div;
 }
 
@@ -432,18 +421,17 @@ function _buildHabitManageCard(h) {
       </div>
       <div class="flex gap-6">
         <button type="button" class="btn btn-ghost"
-                style="font-size:12px;padding:5px 10px">Изменить</button>
+                style="font-size:12px;padding:5px 10px"
+                onclick="openEdit('${h.id}')">Изменить</button>
         <button type="button" class="btn btn-ghost"
-                style="font-size:12px;padding:5px 10px">Удалить</button>
+                style="font-size:12px;padding:5px 10px"
+                onclick="openDelete('${h.id}')">Удалить</button>
       </div>
     </div>
     <div class="flex gap-12 mt-8" style="font-size:12px;color:var(--text3)">
       <span>${h.bad ? '🛡️' : '🔥'} Личный рекорд: ${streak} дн.</span>
       <span>🏆 Рекорд: ${best} дн.</span>
     </div>`;
-  const [editBtn, deleteBtn] = div.querySelectorAll('.flex.gap-6 .btn');
-  editBtn.addEventListener('click', () => openEdit(h.id));
-  deleteBtn.addEventListener('click', () => openDelete(h.id));
   return div;
 }
 
@@ -1400,7 +1388,7 @@ function renderBadges() {
                         <div class="stages-road-dot" style="--sc:${s.color}">
                           ${s.emoji}
                         </div>
-                        <div class="stages-road-name">${esc(s.nameRU)}</div>
+                        <div class="stages-road-name">${esc(s.name)}</div>
                         <div class="stages-road-pts">${s.pts.toLocaleString()}</div>
                       </div>
                       ${i < STAGES.length - 1 ? '<div class="stages-road-line' + (done ? ' done' : '') + '"></div>' : ''}`;
@@ -1410,7 +1398,7 @@ function renderBadges() {
 
         <div class="panel panel-body">
           <div class="panel-title">
-            Все значки · ${earnedBadges.length} из ${BADGES.length}
+            All badges · ${earnedBadges.length} of ${BADGES.length}
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
             ${BADGES.map(b => {
@@ -1473,7 +1461,6 @@ function _obRender() {
   _obProgress();
   _obContent();
   _obFooterRender();
-  _obSetupInstallStep();
 }
 
 function _obProgress() {
@@ -1556,157 +1543,6 @@ function obSkip() {
   saveData();
   renderAll();
 }
-
-const _OB_INSTALL_STEP = 6;
-
-function _isPwaStandalone() {
-  return window.matchMedia('(display-mode: standalone)').matches
-    || window.navigator.standalone === true;
-}
-
-function _isLikelyIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent)
-    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
-
-const _IOS_INAPP_HINT_KEY = 'habitflow_ios_inapp_hint';
-
-/** Известные встроенные браузеры на iOS (по userAgent). */
-function _iosInAppHostLabel(ua) {
-  const u = ua || '';
-  if (/VKJSBridge|VKShare|vk_share|VK_ios|VkClient|VK\/\d/i.test(u)) return 'ВКонтакте';
-  if (/OKApp/i.test(u)) return 'Одноклассники';
-  if (/Instagram/i.test(u)) return 'Instagram';
-  if (/FBAN|FBAV|FB_IAB/i.test(u)) return 'Facebook';
-  if (/\bTelegram\b/i.test(u)) return 'Telegram';
-  if (/TikTok|musical_ly|Bytedance/i.test(u)) return 'TikTok';
-  if (/\bTwitter\b/i.test(u)) return 'Twitter';
-  if (/Line\//i.test(u)) return 'LINE';
-  if (/MicroMessenger/i.test(u)) return 'WeChat';
-  if (/Snapchat/i.test(u)) return 'Snapchat';
-  if (/LinkedInApp/i.test(u)) return 'LinkedIn';
-  if (/Discord/i.test(u)) return 'Discord';
-  return null;
-}
-
-/**
- * Встроенный WebView на iPhone часто без подстроки Version/… перед Mobile/… Safari/
- * (в отличие от полноценного Safari). Не трогаем Android и полноценные iOS-браузеры.
- */
-function _iosLikelyEmbeddedWebView() {
-  const ua = navigator.userAgent || '';
-  if (!_isLikelyIOS()) return false;
-  if (/CriOS|FxiOS|EdgiOS/.test(ua)) return false;
-  if (/Version\/[\d.]+[^\n]*Mobile[^\n]*Safari\//i.test(ua)) return false;
-  return /AppleWebKit.+Mobile\/\S+.+Safari\//i.test(ua);
-}
-
-function _shouldShowIOSInAppSafariHint() {
-  if (!_isLikelyIOS() || _isPwaStandalone()) return false;
-  if (sessionStorage.getItem(_IOS_INAPP_HINT_KEY) === '1') return false;
-  const ua = navigator.userAgent || '';
-  return !!_iosInAppHostLabel(ua) || _iosLikelyEmbeddedWebView();
-}
-
-function dismissIOSInAppBanner() {
-  const el = document.getElementById('iosInAppBanner');
-  if (el) el.hidden = true;
-  document.documentElement.classList.remove('ios-inapp-banner-visible');
-  try {
-    sessionStorage.setItem(_IOS_INAPP_HINT_KEY, '1');
-  } catch (e) { /* private mode */ }
-}
-
-function _initIOSInAppBanner() {
-  if (!_shouldShowIOSInAppSafariHint()) return;
-  const el = document.getElementById('iosInAppBanner');
-  const msg = document.getElementById('iosInAppBannerMsg');
-  if (!el || !msg) return;
-
-  const ua = navigator.userAgent || '';
-  const label = _iosInAppHostLabel(ua);
-  const openSafari = 'Нажми «⋯» или «Поделиться» внизу и выбери «Открыть в Safari» или «Открыть в браузере». Если такого пункта нет — скопируй адрес страницы и вставь его в Safari. Затем в Safari: «Поделиться» → «На экран «Домой»».';
-
-  if (label) {
-    msg.textContent = `Похоже, HabitFlow открыт внутри «${label}». Здесь нельзя добавить сайт на экран «Домой». ${openSafari}`;
-  } else {
-    msg.textContent = `Похоже, страница открыта во встроенном браузере (не Safari). Так нельзя добавить HabitFlow на экран «Домой». ${openSafari}`;
-  }
-
-  el.hidden = false;
-  document.documentElement.classList.add('ios-inapp-banner-visible');
-}
-
-function _obSetupInstallStep() {
-  if (_obStep !== _OB_INSTALL_STEP) return;
-  const btn = document.getElementById('obPwaInstallBtn');
-  const fb = document.getElementById('obPwaInstallFallback');
-  if (!btn || !fb) return;
-
-  if (_pwaInstalledThisSession && !_isPwaStandalone()) {
-    btn.hidden = true;
-    fb.hidden = false;
-    fb.textContent = 'Установка прошла успешно. Закрой эту вкладку и открой HabitFlow с иконки на главном экране или в меню программ.';
-    return;
-  }
-
-  if (_isPwaStandalone()) {
-    btn.hidden = true;
-    fb.hidden = false;
-    fb.textContent = 'Приложение уже установлено — открой его с главного экрана или из списка программ.';
-    return;
-  }
-
-  if (_deferredInstallPrompt) {
-    btn.hidden = false;
-    fb.hidden = true;
-    return;
-  }
-
-  btn.hidden = true;
-  fb.hidden = false;
-  if (_isLikelyIOS()) {
-    fb.textContent = 'В Safari нажми «Поделиться», затем «На экран «Домой»». Системного окна «Установить», как в Chrome, здесь нет.';
-  } else {
-    fb.textContent = 'Когда браузер предложит установку — соглашайся. Иначе: значок установки в адресной строке или меню ⋮ → «Установить приложение» (Chrome / Edge).';
-  }
-}
-
-async function pwaTryInstall() {
-  if (_isPwaStandalone()) {
-    showToast('Приложение уже установлено.');
-    return;
-  }
-  if (!_deferredInstallPrompt) {
-    if (_isLikelyIOS()) {
-      showToast('Safari: «Поделиться» → «На экран «Домой»»');
-    } else {
-      showToast('Ищи значок установки в адресной строке или пункт в меню браузера.');
-    }
-    return;
-  }
-
-  try {
-    const ev = _deferredInstallPrompt;
-    _deferredInstallPrompt = null;
-    ev.prompt();
-    const { outcome } = await ev.userChoice;
-    if (outcome === 'accepted') {
-      showToast('Готово — приложение добавлено.');
-    }
-    _obSetupInstallStep();
-  } catch (_err) {
-    _deferredInstallPrompt = null;
-    _obSetupInstallStep();
-  }
-}
-
-document.addEventListener('habitflow-install-available', () => {
-  if (_obStep === _OB_INSTALL_STEP) _obSetupInstallStep();
-});
-document.addEventListener('habitflow-install-done', () => {
-  if (_obStep === _OB_INSTALL_STEP) _obSetupInstallStep();
-});
 
 function loadDemoData() {
   const yesterday = (() => {
@@ -1916,11 +1752,6 @@ function _obSteps() {
      <div class="ob-title">Установи как приложение</div>
      <div class="ob-text">HabitFlow можно установить на телефон или компьютер —
        будет работать как обычное приложение без браузерной строки.</div>
-     <div class="ob-install-block">
-       <button type="button" class="ob-btn-install" id="obPwaInstallBtn"
-               onclick="pwaTryInstall()">Установить приложение</button>
-       <p class="ob-install-fallback" id="obPwaInstallFallback" hidden></p>
-     </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">🤖</div>
        <div class="ob-data-text"><b>Android:</b> открой в Chrome →
@@ -2162,25 +1993,30 @@ document.addEventListener('DOMContentLoaded', () => {
   _syncSeriesWidgetToggleUI();
   _syncNetworkStatusUI(false);
 
-  _initIOSInAppBanner();
-
   window.addEventListener('online', () => _syncNetworkStatusUI(true));
   window.addEventListener('offline', () => _syncNetworkStatusUI(true));
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    _pwaInstalledThisSession = true;
+    _deferredInstallPrompt = null;
+    showToast('✓ App installed — open from your home screen');
+  });
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
         .then(reg => {
-          // Проверяем обновления каждый раз при открытии
           reg.update();
-
-          // Когда новый SW готов — перезагружаем страницу
           reg.addEventListener('updatefound', () => {
             const newSW = reg.installing;
             if (!newSW) return;
             newSW.addEventListener('statechange', () => {
               if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                // Новая версия готова — тихо применяем
                 newSW.postMessage('SKIP_WAITING');
               }
             });
@@ -2188,10 +2024,27 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(() => {});
 
-      // Перезагружаем когда SW поменялся
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         window.location.reload();
       });
     });
   }
 });
+
+function pwaTryInstall() {
+  if (_pwaInstalledThisSession) {
+    showToast('✓ App already installed — open from your home screen');
+    return;
+  }
+  if (!_deferredInstallPrompt) {
+    showToast('To install: use browser menu → "Add to Home Screen"');
+    return;
+  }
+  try {
+    _deferredInstallPrompt.prompt();
+    _deferredInstallPrompt.userChoice.then(r => {
+      if (r.outcome === 'accepted') showToast('✓ Installing…');
+      _deferredInstallPrompt = null;
+    });
+  } catch (_err) {}
+}

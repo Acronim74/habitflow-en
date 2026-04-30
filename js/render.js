@@ -1,4 +1,4 @@
-﻿// ── Круговой прогресс дня (SVG-дуга) ─────────
+﻿// ── Circular day progress (SVG arc) ──────────
 
 const _ARC_CIRCUMFERENCE = 251.2; // 2π × r40
 
@@ -32,7 +32,7 @@ function _drawGauge(pct) {
   if (arcFill) {
     const fillPct = Math.min(val, 100);
     arcFill.style.strokeDashoffset = _ARC_CIRCUMFERENCE * (1 - fillPct / 100);
-    arcFill.style.stroke = val >= 100 ? 'var(--accent)' : 'var(--accent)';
+    arcFill.style.stroke = 'var(--accent)';
   }
 
   const pctEl = document.getElementById('gaugePct');
@@ -55,8 +55,7 @@ function renderNav() {
 
   const avt = document.getElementById('navAvText');
   if (avt) {
-    avt.textContent =
-      stage.name + ' · ' + total.toLocaleString() + ' pts';
+    avt.textContent = stage.name + ' · ' + total.toLocaleString() + ' pts';
   }
 }
 
@@ -402,7 +401,7 @@ function _buildHCard(h, tk, isBonus) {
         <div class="hcard-row">
           <div class="hcard-done-zone">
             <div class="hcard-done-ico">${backIco}</div>
-            <div class="hcard-done-lbl">${isBonus ? 'бонус' : 'готово'}</div>
+            <div class="hcard-done-lbl">${isBonus ? 'bonus' : 'done'}</div>
           </div>
           <div class="hcard-body">
             <div class="hcard-top">
@@ -427,9 +426,7 @@ function _buildHCard(h, tk, isBonus) {
           <div class="hcard-back-title">${backTitle}</div>
           <div class="hcard-back-time">${esc(timeStr) || '—'}</div>
         </div>
-        <button type="button" class="hcard-back-undo">
-          отменить
-        </button>
+        <button type="button" class="hcard-back-undo">undo</button>
       </div>
 
     </div>`;
@@ -516,13 +513,13 @@ function _buildBCard(h, tk) {
             <div class="${subCls}">${esc(subText)}</div>
           </div>
           <div class="bcard-btns">
-            <button type="button" class="btn-green" title="Выдержал">
+            <button type="button" class="btn-green" title="Held strong">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M2.5 7L5.5 10L11.5 4" stroke="var(--accent)"
                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
-            <button type="button" class="btn-red" title="Был срыв">
+            <button type="button" class="btn-red" title="Had a slip">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M4 4L10 10M10 4L4 10" stroke="var(--bad)"
                   stroke-width="1.8" stroke-linecap="round"/>
@@ -533,7 +530,7 @@ function _buildBCard(h, tk) {
         <div class="bcard-bar-track"><div class="bcard-bar"></div></div>
       </div>
 
-      <!-- Обратная сторона -->
+      <!-- Back side -->
       <div data-face="back" style="position:absolute;inset:0;
                   backface-visibility:hidden;
                   -webkit-backface-visibility:hidden;
@@ -554,7 +551,7 @@ function _buildBCard(h, tk) {
                        border:0.5px solid rgba(255,255,255,.25);
                        border-radius:var(--r-md);background:transparent;
                        white-space:nowrap;flex-shrink:0">
-          отменить
+          undo
         </button>
       </div>
 
@@ -566,7 +563,6 @@ function _buildBCard(h, tk) {
   wrap.querySelector('.btn-red').addEventListener('click', e => { e.stopPropagation(); openSlip(hid); });
   const backBtn = wrap.querySelector('[data-face="back"] button');
   if (backBtn) backBtn.addEventListener('click', e => { e.stopPropagation(); resetBadCard(hid); });
-
   return wrap;
 }
 

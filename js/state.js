@@ -42,7 +42,7 @@ function saveData() {
     localStorage.setItem(LS_KEY, JSON.stringify(data));
   } catch (e) {
     if (e.name === 'QuotaExceededError' && typeof showToast === 'function') {
-      showToast('⚠️ Хранилище переполнено — сделай экспорт резервной копии');
+      showToast('⚠️ Storage full — export a backup copy');
     }
   }
 }
@@ -65,7 +65,7 @@ function loadData() {
     _migrateData();
     _syncCleanTodaySetFromData();
   } catch (_e) {
-    // повреждённые данные — игнорируем, сбрасываем к дефолту
+    // corrupted data — ignore, reset to defaults
   }
 }
 
