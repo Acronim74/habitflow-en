@@ -1544,6 +1544,10 @@ function obSkip() {
 }
 
 function loadDemoData() {
+  if (habits.length > 0) {
+    const ok = confirm('Loading demo data will replace all your habits and history.\nContinue?');
+    if (!ok) return;
+  }
   const yesterday = (() => {
     const d = new Date();
     d.setDate(d.getDate() - 1);
