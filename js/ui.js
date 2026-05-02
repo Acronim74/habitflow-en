@@ -2021,6 +2021,13 @@ document.addEventListener('DOMContentLoaded', () => {
   _syncNetworkStatusUI(false);
   _loadBurgerVersion();
 
+  document.addEventListener('click', e => {
+    const drawer = document.getElementById('burgerDrawer');
+    const btn    = document.getElementById('burgerBtn');
+    if (!drawer || !drawer.classList.contains('open')) return;
+    if (!drawer.contains(e.target) && !btn.contains(e.target)) closeBurger();
+  });
+
   window.addEventListener('online', () => _syncNetworkStatusUI(true));
   window.addEventListener('offline', () => _syncNetworkStatusUI(true));
 
