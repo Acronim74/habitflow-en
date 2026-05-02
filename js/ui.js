@@ -1727,7 +1727,7 @@ function _obSteps() {
      <div class="ob-data-row">
        <div class="ob-data-ico">🎨</div>
        <div class="ob-data-text">Theme — four options:
-         Light, Dark, Tron and Blade Runner</div>
+         Light, Dark, Forest and Veloce</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">📊</div>
@@ -1891,7 +1891,7 @@ const GUIDE_MODAL_HTML = `
 
   <div class="card">
     <p>The theme switcher is in the menu next to the avatar.
-    Four themes available: ☀️ Light, 🌙 Dark, ◈ Tron, ◉ Blade Runner.</p>
+    Four themes available: ☀️ Light, 🌙 Dark, 🌿 Forest, ◈ Veloce.</p>
   </div>
 
   <p class="footer">HabitFlow · works fully offline</p>
@@ -1949,7 +1949,7 @@ function closeBurger() {
 // ── Инициализация ─────────────────────────
 
 function setTheme(theme, save = true) {
-  const allowed = new Set(['light', 'dark', 'tron', 'blade']);
+  const allowed = new Set(['light', 'dark', 'forest', 'veloce']);
   const t = allowed.has(theme) ? theme : 'light';
   document.documentElement.setAttribute('data-theme', t);
 
