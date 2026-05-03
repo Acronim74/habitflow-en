@@ -106,6 +106,11 @@ function _migrateData() {
     }
   });
   if (moodMigrateDirty) saveData();
+
+  // Strip 'champion' badge if it was awarded under old buggy conditions
+  if (earnedBadges.includes('champion') && !_checkChampion()) {
+    earnedBadges = earnedBadges.filter(id => id !== 'champion');
+  }
 }
 
 // ── Миграции схемы данных ──────────────────
