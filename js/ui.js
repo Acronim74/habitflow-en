@@ -6,7 +6,7 @@ let _deferredInstallPrompt = null;
 let _pwaInstalledThisSession = false;
 
 let _obStep = 0;
-const _OB_TOTAL = 8;
+const _OB_TOTAL = 9;
 const _ONBOARDING_DONE_KEY = 'habitflow_onboarding_done';
 let _lastNetworkOnline = null;
 
@@ -14,6 +14,7 @@ let _lastNetworkOnline = null;
 const _OB_HEADINGS = [
   'WELCOME',
   'TRACKING',
+  'NOTES',
   'CREATING A HABIT',
   'STREAKS & POINTS',
   'ANALYTICS & BADGES',
@@ -1636,6 +1637,37 @@ function _obSteps() {
        <div class="ob-hint-ico">💡</div>
        <div class="ob-hint-text">For bad habits — two buttons:
          ✓ Held strong or ✕ Had a slip.</div>
+     </div>`,
+
+    `<div class="ob-ico">💬</div>
+     <div class="ob-title">Notes on habits</div>
+     <div class="ob-text">Once a habit is done, a 💬 button appears — tap it to leave a short note about how it went.</div>
+     <div class="ob-preview" style="flex-direction:column;align-items:stretch;gap:8px">
+       <div class="ob-card-back" style="border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+         <div class="ob-card-back-ico">✓</div>
+         <div style="flex:1">
+           <div class="ob-card-back-title">Done!</div>
+           <div class="ob-card-back-time">07:24</div>
+         </div>
+         <div style="display:flex;flex-direction:column;gap:5px;align-items:center">
+           <div style="font-size:14px;border:0.5px solid rgba(255,255,255,.3);border-radius:6px;padding:2px 7px;cursor:pointer">💬</div>
+           <div class="ob-card-back-undo">undo</div>
+         </div>
+       </div>
+       <div class="ob-card-back" style="border-radius:10px;padding:10px 14px;background:var(--surface)">
+         <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">
+           💬 2 notes <span style="margin-left:auto">▾</span>
+         </div>
+         <div style="margin-top:6px;font-size:11px;color:var(--text2)">
+           <div style="padding:3px 0;border-bottom:0.5px solid var(--border)">3 May · Got up easily, no hesitation</div>
+           <div style="padding:3px 0">2 May · Rainy day, ran around the park</div>
+         </div>
+       </div>
+     </div>
+     <div class="ob-hint">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">Past notes appear below the card — tap to expand.
+         Great for spotting patterns over time.</div>
      </div>`,
 
     `<div class="ob-ico-plus" aria-hidden="true">+</div>

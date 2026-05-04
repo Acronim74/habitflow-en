@@ -375,6 +375,10 @@ function _buildHCard(h, tk, isBonus) {
         { hour:'2-digit', minute:'2-digit' })
     : '';
 
+  const allComments = Object.entries(h.notes || {})
+    .filter(([, note]) => note.comment)
+    .sort(([a], [b]) => b.localeCompare(a));
+
   let wrapCls = 'hcard';
   if (isBonus && isDone)   wrapCls += ' hc-bonus-done';
   else if (isBonus)        wrapCls += ' hc-bonus';
@@ -426,7 +430,10 @@ function _buildHCard(h, tk, isBonus) {
           <div class="hcard-back-title">${backTitle}</div>
           <div class="hcard-back-time">${esc(timeStr) || '—'}</div>
         </div>
-        <button type="button" class="hcard-back-undo">undo</button>
+        <div class="hcard-back-btns">
+          <button type="button" class="hcard-back-comment" title="Add note">💬</button>
+          <button type="button" class="hcard-back-undo">undo</button>
+        </div>
       </div>
 
     </div>`;
@@ -434,6 +441,36 @@ function _buildHCard(h, tk, isBonus) {
   const hid = h.id;
   wrap.querySelector('.hcard-row').addEventListener('click', () => toggleCheck(hid));
   wrap.querySelector('.hcard-back-undo').addEventListener('click', () => toggleCheck(hid));
+  wrap.querySelector('.hcard-back-comment').addEventListener('click', e => {
+    e.stopPropagation();
+    openComment(hid);
+  });
+
+  if (allComments.length > 0) {
+    const n = allComments.length;
+    const label = n === 1 ? '1 note' : `${n} notes`;
+    const listHtml = allComments.map(([dk, note]) => {
+      const d = new Date(dk + 'T00:00:00');
+      const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+      return `<div class="hcard-note-item">
+        <span class="hcard-note-date">${dateStr}</span>
+        <span class="hcard-note-text">${esc(note.comment)}</span>
+      </div>`;
+    }).join('');
+    const notesEl = document.createElement('div');
+    notesEl.className = 'hcard-notes';
+    notesEl.innerHTML = `
+      <button type="button" class="hcard-notes-toggle">
+        💬 ${label}<span class="hcard-notes-chevron">▾</span>
+      </button>
+      <div class="hcard-notes-list">${listHtml}</div>`;
+    notesEl.querySelector('.hcard-notes-toggle').addEventListener('click', e => {
+      e.stopPropagation();
+      notesEl.classList.toggle('open');
+    });
+    wrap.appendChild(notesEl);
+  }
+
   return wrap;
 }
 
