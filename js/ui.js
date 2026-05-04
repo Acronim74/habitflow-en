@@ -432,6 +432,37 @@ function _buildHabitManageCard(h) {
       <span>${h.bad ? '🛡️' : '🔥'} Current streak: ${streak} d.</span>
       <span>🏆 Best: ${best} d.</span>
     </div>`;
+
+  const allComments = Object.entries(h.notes || {})
+    .filter(([, note]) => note.comment)
+    .sort(([a], [b]) => b.localeCompare(a));
+
+  if (allComments.length > 0) {
+    const n = allComments.length;
+    const label = n === 1 ? '1 note' : `${n} notes`;
+    const listHtml = allComments.map(([dk, note]) => {
+      const d = new Date(dk + 'T00:00:00');
+      const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+      return `<div class="hcard-note-item">
+        <span class="hcard-note-date">${dateStr}</span>
+        <span class="hcard-note-text">${esc(note.comment)}</span>
+      </div>`;
+    }).join('');
+    const notesEl = document.createElement('div');
+    notesEl.className = 'hcard-notes';
+    notesEl.style.borderTop = '0.5px solid var(--border)';
+    notesEl.style.marginTop = '8px';
+    notesEl.innerHTML = `
+      <button type="button" class="hcard-notes-toggle">
+        💬 ${label}<span class="hcard-notes-chevron">▾</span>
+      </button>
+      <div class="hcard-notes-list">${listHtml}</div>`;
+    notesEl.querySelector('.hcard-notes-toggle').addEventListener('click', () => {
+      notesEl.classList.toggle('open');
+    });
+    div.appendChild(notesEl);
+  }
+
   return div;
 }
 
