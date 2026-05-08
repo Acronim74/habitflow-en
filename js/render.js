@@ -417,9 +417,9 @@ function _buildHCard(h, tk, isBonus) {
             </div>
             <div class="${subCls}">${esc(subText)}</div>
           </div>
+          <button type="button" class="hcard-front-comment" title="Add note">💬</button>
           <div class="hcard-check-zone">
             <div class="hcard-btn"></div>
-            <button type="button" class="hcard-front-comment" title="Add note">💬</button>
           </div>
         </div>
         <div class="hcard-bar-track">
