@@ -413,7 +413,7 @@ function _buildHCard(h, tk, isBonus) {
           <div class="hcard-body">
             <div class="hcard-top">
               <span class="hcard-ico">${h.icon || '⭐'}</span>
-              <span class="hcard-name">${esc(h.name)}</span>
+              <span class="hcard-name">${esc(h.name)}</span>${h.night ? '<span class="hcard-night-badge">🌙</span>' : ''}
             </div>
             <div class="${subCls}">${esc(subText)}</div>
           </div>

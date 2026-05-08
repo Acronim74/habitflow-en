@@ -415,7 +415,7 @@ function _buildHabitManageCard(h) {
         <div style="min-width:0">
           <div style="font-size:13px;font-weight:500">${esc(h.name)}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:2px">
-            ${esc(h.category || '')}${esc(scheduleLabel(h))}${notesCount > 0 ? ` · 💬 ${notesCount}` : ''}
+            ${h.night ? '🌙 ' : ''}${esc(h.category || '')}${esc(scheduleLabel(h))}${notesCount > 0 ? ` · 💬 ${notesCount}` : ''}
           </div>
         </div>
       </div>

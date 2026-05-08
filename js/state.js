@@ -23,6 +23,7 @@ let _createCat      = '';
 let _createSchedule = null;   // null = каждый день
                                // [] = кастомные дни недели (0=Пн..6=Вс)
 let _editingId = null; // id редактируемой привычки, null = создание новой
+let _createNight = false;
 
 // ── Сохранение ─────────────────────────────
 function saveData() {
@@ -91,6 +92,7 @@ function _migrateData() {
     if (!h.icon)      h.icon     = h.bad ? '🚫' : '⭐';
     if (!h.createdAt) h.createdAt = _todayKey();
     if (h.schedule === undefined) h.schedule = null;
+    if (h.night === undefined) h.night = false;
   });
 
   let moodMigrateDirty = false;

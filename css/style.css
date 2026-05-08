@@ -1547,6 +1547,13 @@ html.ios-inapp-banner-visible .app {
   overflow: hidden;
 }
 
+.hcard-night-badge {
+  font-size: 12px;
+  margin-left: 4px;
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+
 .hcard-back-btns {
   display: flex;
   flex-direction: column;
