@@ -2153,25 +2153,33 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   if ('serviceWorker' in navigator) {
+    let _swReloading = false;
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (_swReloading) return;
+      _swReloading = true;
+      window.location.reload();
+    });
+
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
         .then(reg => {
-          reg.update();
+          if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+
           reg.addEventListener('updatefound', () => {
             const newSW = reg.installing;
             if (!newSW) return;
             newSW.addEventListener('statechange', () => {
-              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                newSW.postMessage('SKIP_WAITING');
-              }
+              if (newSW.state === 'installed') newSW.postMessage('SKIP_WAITING');
             });
+          });
+
+          reg.update();
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') reg.update();
           });
         })
         .catch(() => {});
-
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        window.location.reload();
-      });
     });
   }
 });
