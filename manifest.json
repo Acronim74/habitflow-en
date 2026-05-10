@@ -1,14 +1,37 @@
 {
-  "name": "HabitFlow RU",
+  "name": "HabitFlow",
   "short_name": "HabitFlow",
-  "description": "Офлайн трекер привычек",
+  "description": "Offline habit tracker",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f2f2ed",
   "theme_color": "#2d6a4f",
-  "lang": "ru",
+  "lang": "en",
+  "shortcuts": [
+    {
+      "name": "Today",
+      "short_name": "Today",
+      "description": "Today's habit list",
+      "url": "./?screen=today",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "New Habit",
+      "short_name": "Add",
+      "description": "Create a new habit",
+      "url": "./?action=create",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "description": "Open analytics screen",
+      "url": "./?screen=analytics",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
   "icons": [
     {
       "src": "icons/icon-192.png",

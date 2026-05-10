@@ -25,6 +25,9 @@ let _createSchedule = null;   // null = каждый день
 let _editingId = null; // id редактируемой привычки, null = создание новой
 let _createNight = false;
 
+let notificationEnabled = false;
+let notificationTime    = '21:00';
+
 // ── Сохранение ─────────────────────────────
 function saveData() {
   try {
@@ -38,9 +41,12 @@ function saveData() {
       dayProgressWidgetEnabled,
       bestStreakWidgetEnabled,
       seriesWidgetEnabled,
+      notificationEnabled,
+      notificationTime,
       savedAt: new Date().toISOString(),
     };
     localStorage.setItem(LS_KEY, JSON.stringify(data));
+    if (typeof _updateBadge === 'function') _updateBadge();
   } catch (e) {
     if (e.name === 'QuotaExceededError' && typeof showToast === 'function') {
       showToast('⚠️ Storage full — export a backup copy');
@@ -63,6 +69,8 @@ function loadData() {
     dayProgressWidgetEnabled = d.dayProgressWidgetEnabled === undefined ? true : !!d.dayProgressWidgetEnabled;
     bestStreakWidgetEnabled = d.bestStreakWidgetEnabled === undefined ? true : !!d.bestStreakWidgetEnabled;
     seriesWidgetEnabled = d.seriesWidgetEnabled === undefined ? true : !!d.seriesWidgetEnabled;
+    notificationEnabled = d.notificationEnabled || false;
+    notificationTime    = typeof d.notificationTime === 'string' ? d.notificationTime : '21:00';
     _migrateData();
     _syncCleanTodaySetFromData();
   } catch (_e) {

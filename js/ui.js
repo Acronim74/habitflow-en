@@ -117,6 +117,7 @@ function renderAll() {
   _syncDayProgressWidgetToggleUI();
   _syncBestStreakWidgetToggleUI();
   _syncSeriesWidgetToggleUI();
+  _syncNotificationToggleUI();
 }
 
 /** Синхронизирует переключатель дневника настроения: вкладка «Привычки» и меню «Виджеты». */
@@ -163,6 +164,99 @@ function _syncSeriesWidgetToggleUI() {
   const knob = btn.querySelector('.mood-toggle-knob') || btn.firstElementChild;
   if (knob) knob.style.left = on ? '23px' : '3px';
   btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+
+// ── Notifications ─────────────────────────
+
+let _notifTimer = null;
+
+function _syncNotificationToggleUI() {
+  const on  = notificationEnabled;
+  const btn = document.getElementById('notificationToggleBurger');
+  if (btn) {
+    btn.style.background = on ? 'var(--accent)' : 'var(--border2)';
+    const knob = btn.querySelector('.mood-toggle-knob') || btn.firstElementChild;
+    if (knob) knob.style.left = on ? '23px' : '3px';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  const row = document.getElementById('notificationTimeRow');
+  if (row) row.style.display = on ? 'flex' : 'none';
+  const inp = document.getElementById('notificationTimeInput');
+  if (inp) inp.value = notificationTime;
+  const note = document.getElementById('notificationNote');
+  if (note) note.style.display = on ? 'block' : 'none';
+}
+
+async function toggleNotification() {
+  if (!('Notification' in window)) {
+    showToast('Your browser does not support notifications');
+    return;
+  }
+  if (!notificationEnabled) {
+    const perm = Notification.permission === 'granted'
+      ? 'granted'
+      : await Notification.requestPermission();
+    if (perm !== 'granted') {
+      showToast('Notification permission denied — check browser settings');
+      return;
+    }
+    notificationEnabled = true;
+    saveData();
+    _syncNotificationToggleUI();
+    _scheduleNotification();
+    showToast('🔔 Reminders on · daily at ' + notificationTime);
+  } else {
+    notificationEnabled = false;
+    if (_notifTimer) { clearTimeout(_notifTimer); _notifTimer = null; }
+    saveData();
+    _syncNotificationToggleUI();
+    showToast('Reminders off');
+  }
+}
+
+function setNotificationTime(val) {
+  if (!val) return;
+  notificationTime = val;
+  saveData();
+  if (notificationEnabled) {
+    _scheduleNotification();
+    showToast('⏰ Reminder moved to ' + val);
+  }
+}
+
+function _scheduleNotification() {
+  if (_notifTimer) { clearTimeout(_notifTimer); _notifTimer = null; }
+  if (!notificationEnabled) return;
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+
+  const [h, m] = notificationTime.split(':').map(Number);
+  const now    = new Date();
+  const target = new Date(now);
+  target.setHours(h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+
+  _notifTimer = setTimeout(() => {
+    _fireNotification();
+    _scheduleNotification();
+  }, target - now);
+}
+
+function _fireNotification() {
+  const tk     = _todayKey();
+  const good   = habits.filter(h => !h.bad && _isWorkDay(h, tk));
+  const undone = good.filter(h => !h.checks?.[tk]).length;
+  const body   = undone > 0
+    ? `${undone} habits left · ${good.length - undone} of ${good.length} done`
+    : good.length > 0
+      ? `All habits done today 🎉`
+      : `Add some habits and start tracking`;
+
+  const sw = navigator.serviceWorker?.controller;
+  if (sw) {
+    sw.postMessage({ type: 'SHOW_NOTIFICATION', title: 'HabitFlow', body });
+  } else if (Notification.permission === 'granted') {
+    new Notification('HabitFlow', { body, icon: 'icons/icon-192.png' });
+  }
 }
 
 // ── Экран Привычки ────────────────────────
@@ -2128,7 +2222,21 @@ document.addEventListener('DOMContentLoaded', () => {
   _syncDayProgressWidgetToggleUI();
   _syncBestStreakWidgetToggleUI();
   _syncSeriesWidgetToggleUI();
+  _syncNotificationToggleUI();
   _syncNetworkStatusUI(false);
+
+  const _urlParams = new URLSearchParams(location.search);
+  const _urlScreen = _urlParams.get('screen');
+  const _urlAction = _urlParams.get('action');
+  if (_urlScreen && ['today','habits','analytics','badges'].includes(_urlScreen)) {
+    navigate(_urlScreen);
+  }
+  if (_urlAction === 'create') {
+    navigate('habits');
+    setTimeout(() => openCreate('good'), 150);
+  }
+
+  _scheduleNotification();
   _loadBurgerVersion();
 
   document.addEventListener('click', e => {
