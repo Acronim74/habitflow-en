@@ -2309,3 +2309,111 @@ function pwaTryInstall() {
     });
   } catch (_err) {}
 }
+
+function _detectBrowserForInstall() {
+  const ua = navigator.userAgent;
+  const isIOS     = /iPhone|iPad|iPod/i.test(ua);
+  const isMac     = /Macintosh/i.test(ua) && !/iPhone|iPad/i.test(ua);
+  const isAndroid = /Android/i.test(ua);
+
+  if (/VKONTAKTE|VKWebView/i.test(ua)) return { name: 'VKontakte',      type: 'inapp-vk' };
+  if (/Instagram/i.test(ua))           return { name: 'Instagram',       type: 'inapp' };
+  if (/FBAN|FBAV/i.test(ua))           return { name: 'Facebook',        type: 'inapp' };
+  if (/Telegram/i.test(ua))            return { name: 'Telegram',        type: 'inapp' };
+
+  if (isIOS) {
+    if (/CriOS/i.test(ua))  return { name: 'Chrome (iOS)',  type: 'ios-other' };
+    if (/FxiOS/i.test(ua))  return { name: 'Firefox (iOS)', type: 'ios-other' };
+    if (/EdgiOS/i.test(ua)) return { name: 'Edge (iOS)',    type: 'ios-other' };
+    return { name: 'Safari', type: 'ios-safari' };
+  }
+
+  if (_deferredInstallPrompt) {
+    if (/SamsungBrowser/i.test(ua)) return { name: 'Samsung Internet', type: 'native' };
+    if (/Edg\//i.test(ua))          return { name: 'Edge',             type: 'native' };
+    return { name: 'Chrome', type: 'native' };
+  }
+
+  if (/Firefox/i.test(ua)) return { name: 'Firefox', type: 'firefox' };
+  if (isMac && /Safari/i.test(ua) && !/Chrome/i.test(ua)) return { name: 'Safari (macOS)', type: 'safari-mac' };
+  if (isAndroid) return { name: 'Chrome', type: 'android-manual' };
+  return { name: 'browser', type: 'other' };
+}
+
+function showInstallHelp() {
+  if (_isPwaStandalone()) { showToast('App is already installed.'); return; }
+
+  const { name, type } = _detectBrowserForInstall();
+  const overlay = document.getElementById('installHelpOverlay');
+  const content = document.getElementById('installHelpContent');
+  if (!overlay || !content) return;
+
+  const iosSafariSteps = [
+    '📤 Tap the Share button at the bottom of the screen',
+    '⬇️ Scroll down the actions list',
+    '➕ Tap "Add to Home Screen"',
+    '✅ Tap "Add"',
+  ];
+
+  let note = '', stepsList = [], showNativeBtn = false;
+
+  switch (type) {
+    case 'native':
+      showNativeBtn = true;
+      note = 'Tap the button below — the browser will prompt you to install the app.';
+      break;
+    case 'ios-safari':
+      stepsList = iosSafariSteps;
+      break;
+    case 'ios-other':
+      note = `${name} on iOS does not support PWA installation.<br>Open this page in <strong>Safari</strong>, then:`;
+      stepsList = iosSafariSteps;
+      break;
+    case 'inapp-vk':
+      note = 'The VKontakte in-app browser does not support installation.';
+      stepsList = ['··· → "Open in browser"', '📤 In Safari tap Share', '➕ "Add to Home Screen" → "Add"'];
+      break;
+    case 'inapp':
+      note = 'This in-app browser does not support installation.';
+      stepsList = ['··· → "Open in Safari" / "Open in browser"', '📤 In Safari tap Share', '➕ "Add to Home Screen" → "Add"'];
+      break;
+    case 'firefox':
+      stepsList = ['⋮ Open menu (top right)', '📲 Tap "Install"'];
+      break;
+    case 'safari-mac':
+      stepsList = ['Open the "File" menu in Safari', '📲 Select "Add to Dock"'];
+      break;
+    case 'android-manual':
+      stepsList = ['⋮ Open menu (top right)', '📲 "Install app" or "Add to Home screen"'];
+      break;
+    default:
+      stepsList = ['📲 Click the install icon in the address bar', 'or open browser menu → "Install app"'];
+  }
+
+  const stepsHtml = stepsList.length
+    ? `<ol class="ih-steps">${stepsList.map(s => `<li>${s}</li>`).join('')}</ol>` : '';
+
+  content.innerHTML = `
+    <div class="ih-browser-label">${name}</div>
+    ${note ? `<p class="ih-note">${note}</p>` : ''}
+    ${stepsHtml}
+    ${showNativeBtn ? `<button type="button" class="btn btn-primary ih-install-btn" id="ihNativeBtn">Install now</button>` : ''}
+  `;
+
+  if (showNativeBtn) {
+    document.getElementById('ihNativeBtn').addEventListener('click', () => {
+      closeInstallHelp();
+      if (_deferredInstallPrompt) {
+        const ev = _deferredInstallPrompt;
+        _deferredInstallPrompt = null;
+        ev.prompt();
+      }
+    });
+  }
+  overlay.classList.add('open');
+}
+
+function closeInstallHelp(e) {
+  if (e && e.target !== document.getElementById('installHelpOverlay')) return;
+  document.getElementById('installHelpOverlay').classList.remove('open');
+}
