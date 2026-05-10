@@ -1980,6 +1980,9 @@ html.ios-inapp-banner-visible .app {
   }
 
   .burger-drawer {
+    position: fixed;
+    top: 52px;
+    right: 0;
     max-height: calc(100dvh - 52px - 60px - env(safe-area-inset-bottom, 0px));
   }
 
