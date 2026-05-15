@@ -2218,6 +2218,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   navigate('today');
   renderNav();
+  if (!shouldShowOnboarding) setTimeout(checkNewVersion, 600);
   checkBadges();
   _syncMoodToggleUI();
   _syncDayProgressWidgetToggleUI();
@@ -2417,4 +2418,88 @@ function showInstallHelp() {
 function closeInstallHelp(e) {
   if (e && e.target !== document.getElementById('installHelpOverlay')) return;
   document.getElementById('installHelpOverlay').classList.remove('open');
+}
+
+// ── Changelog + News ──────────────────────────
+
+function checkNewVersion() {
+  const seen = localStorage.getItem('hf_seen_version') || '';
+  if (seen !== APP_VERSION && CHANGELOG.length > 0) {
+    _buildChangelogContent();
+    document.getElementById('changelogOverlay').classList.add('open');
+  }
+}
+
+function _buildChangelogContent() {
+  const cl = CHANGELOG[0];
+  const items = cl.items_en.map(i => `<li>${esc(i)}</li>`).join('');
+  document.getElementById('changelogContent').innerHTML =
+    `<div class="cl-head">
+       <div><span class="cl-badge">v${esc(cl.version)}</span><span class="cl-date">${esc(cl.date_en)}</span></div>
+       <button type="button" class="ih-close" onclick="closeChangelog()" aria-label="Close">✕</button>
+     </div>
+     <h3 class="cl-title">What's new</h3>
+     <p class="cl-subtitle">${esc(cl.title_en)}</p>
+     <ul class="cl-items">${items}</ul>
+     <button type="button" class="btn btn-ghost cl-news-btn" onclick="showNews(true)">All news →</button>`;
+}
+
+function closeChangelog(e) {
+  if (e && e.target !== document.getElementById('changelogOverlay')) return;
+  localStorage.setItem('hf_seen_version', APP_VERSION);
+  document.getElementById('changelogOverlay').classList.remove('open');
+}
+
+function showNews(fromChangelog) {
+  if (fromChangelog) {
+    localStorage.setItem('hf_seen_version', APP_VERSION);
+    document.getElementById('changelogOverlay').classList.remove('open');
+  }
+  _buildNewsContent();
+  document.getElementById('newsOverlay').classList.add('open');
+}
+
+function closeNews(e) {
+  if (e && e.target !== document.getElementById('newsOverlay')) return;
+  document.getElementById('newsOverlay').classList.remove('open');
+}
+
+function _buildNewsContent() {
+  let newsHtml;
+  if (NEWS.length > 0) {
+    newsHtml = NEWS.map(n =>
+      `<div class="news-card">
+         <div class="news-card-head">
+           <span class="news-tag">${esc(n.tag_en)}</span>
+           <span class="news-date">${esc(n.date_en)}</span>
+         </div>
+         <h4 class="news-title">${esc(n.title_en)}</h4>
+         <p class="news-body">${esc(n.body_en)}</p>
+       </div>`
+    ).join('');
+  } else {
+    newsHtml = `<div class="news-empty">News and habit tips coming soon 🌱</div>`;
+  }
+
+  const updatesHtml = CHANGELOG.length > 0
+    ? `<div class="news-updates-title">Updates</div>` +
+      CHANGELOG.map(cl =>
+        `<div class="news-update">
+           <div class="news-update-head">
+             <span class="cl-badge">v${esc(cl.version)}</span>
+             <span class="news-update-title">${esc(cl.title_en)}</span>
+             <span class="news-date">${esc(cl.date_en)}</span>
+           </div>
+           <ul class="cl-items">${cl.items_en.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+         </div>`
+      ).join('')
+    : '';
+
+  document.getElementById('newsContent').innerHTML =
+    `<div class="news-sheet-head">
+       <span class="news-sheet-title">News</span>
+       <button type="button" class="ih-close" onclick="closeNews()" aria-label="Close">✕</button>
+     </div>
+     <div class="news-list">${newsHtml}</div>
+     ${updatesHtml}`;
 }
