@@ -740,6 +740,16 @@ function _buildGoalsList() {
           </div>
           <p class="goal-card-desc">${esc(g.desc)}</p>
           <p class="goal-card-result">${esc(g.result)}</p>
+          <div class="goal-card-habits">
+            ${g.stages[0].habits.map(h => {
+              const freq = getHabitFreq(g.id, h.key, 'en');
+              return `<div class="goal-card-habit-item">
+                <span class="goal-card-habit-icon">${h.icon}</span>
+                <span class="goal-card-habit-name">${esc(h.name)}</span>
+                ${freq ? `<span class="goal-card-habit-freq">${esc(freq)}</span>` : ''}
+              </div>`;
+            }).join('')}
+          </div>
           <button type="button" class="btn btn-primary goal-card-btn" onclick="openGoalSurvey('${g.id}')">Start →</button>
         </div>`).join('')}
     </div>
@@ -771,11 +781,14 @@ function _buildActiveGoalView() {
     const habitsHtml = stageHabits.map(h => {
       const cnt  = _goalHabitChecks(h);
       const pctH = Math.min(100, Math.round(cnt / 21 * 100));
+      const why  = h.goalHabitKey ? getHabitWhy(h.goalId, h.goalHabitKey, 'en') : '';
+      const freq = h.goalHabitKey ? getHabitFreq(h.goalId, h.goalHabitKey, 'en') : '';
       return `<div class="gsi-habit">
         <span class="gsi-habit-icon">${h.icon || '🎯'}</span>
         <span class="gsi-habit-name">${esc(h.name)}</span>
         <span class="gsi-habit-cnt">${cnt}/21</span>
         <div class="gsi-habit-bar"><div class="gsi-habit-fill" style="width:${pctH}%"></div></div>
+        ${why || freq ? `<div class="gsi-habit-detail">${why ? `<p class="gsi-habit-why">${esc(why)}</p>` : ''}${freq ? `<span class="gsi-habit-freq">${esc(freq)}</span>` : ''}</div>` : ''}
       </div>`;
     }).join('');
     return `<div class="gsi ${allDone ? 'gsi-done' : 'gsi-active'}">
