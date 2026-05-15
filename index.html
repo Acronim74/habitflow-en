@@ -63,6 +63,8 @@
               type="button" onclick="navigate('today')">☀️ Today</button>
       <button class="nav-tab" data-screen="habits"
               type="button" onclick="navigate('habits')">✅ Habits</button>
+      <button class="nav-tab" data-screen="goals"
+              type="button" onclick="navigate('goals')">🎯 Goals</button>
       <button class="nav-tab" data-screen="analytics"
               type="button" onclick="navigate('analytics')">📊 Analytics</button>
       <button class="nav-tab" data-screen="badges"
@@ -246,6 +248,11 @@
             type="button" onclick="navigate('habits')">
       <span class="bottom-nav-ico">✅</span>
       <span class="bottom-nav-lbl">Habits</span>
+    </button>
+    <button class="bottom-nav-item" data-screen="goals"
+            type="button" onclick="navigate('goals')">
+      <span class="bottom-nav-ico">🎯</span>
+      <span class="bottom-nav-lbl">Goals</span>
     </button>
     <button class="bottom-nav-item" data-screen="analytics"
             type="button" onclick="navigate('analytics')">
@@ -442,6 +449,7 @@
   <div class="screen" id="screenHabits"></div>
   <div class="screen" id="screenAnalytics"></div>
   <div class="screen" id="screenBadges"></div>
+  <div class="screen" id="screenGoals"></div>
 
 </div><!-- .app -->
 
@@ -483,6 +491,30 @@
   </div>
 </div>
 
+<div class="overlay" id="goalSurveyOverlay" onclick="closeGoalSurvey(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="ih-head">
+      <span class="ih-title">Quick assessment</span>
+      <button type="button" class="ih-close" onclick="closeGoalSurvey()" aria-label="Close">✕</button>
+    </div>
+    <div id="goalSurveyContent"></div>
+  </div>
+</div>
+
+<div class="overlay" id="goalArchiveOverlay" onclick="closeGoalArchiveWarning(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="ih-head">
+      <span class="ih-title">Start goal</span>
+      <button type="button" class="ih-close" onclick="closeGoalArchiveWarning()" aria-label="Close">✕</button>
+    </div>
+    <div id="goalArchiveContent"></div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-ghost" onclick="closeGoalArchiveWarning()">Cancel</button>
+      <button type="button" class="btn btn-primary" id="goalArchiveConfirmBtn">Start</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="installHelpOverlay" onclick="closeInstallHelp(event)">
   <div class="modal install-help-modal" onclick="event.stopPropagation()">
     <div class="ih-head">
@@ -514,6 +546,7 @@
 
 <!-- ════════════ СКРИПТЫ ════════════ -->
 <script src="js/data.js"></script>
+<script src="js/goals.js"></script>
 <script src="js/state.js"></script>
 <script src="js/helpers.js"></script>
 <script src="js/render.js"></script>

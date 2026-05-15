@@ -1,4 +1,4 @@
-const CACHE = 'habitflow-v14';
+const CACHE = 'habitflow-v15';
 
 // Динамически определяем базовый путь — работает с любым именем репо
 const BASE = self.location.pathname.replace(/\/sw\.js$/, '');
@@ -9,6 +9,7 @@ const ASSETS = [
   BASE + '/css/style.css',
   BASE + '/js/assets.js',
   BASE + '/js/data.js',
+  BASE + '/js/goals.js',
   BASE + '/js/state.js',
   BASE + '/js/helpers.js',
   BASE + '/js/render.js',

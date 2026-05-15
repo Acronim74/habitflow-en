@@ -223,17 +223,54 @@ function renderToday() {
 
   const goodList = document.getElementById('goodList');
   goodList.innerHTML = '';
-  const _sorted  = _sortHabits(scheduled);
-  const _undone  = _sorted.filter(h => !h.checks?.[tk]);
-  const _done    = _sorted.filter(h =>  h.checks?.[tk]);
-  _undone.forEach(h => goodList.appendChild(_buildHCard(h, tk, false)));
-  if (_undone.length > 0 && _done.length > 0) {
-    const sep = document.createElement('div');
-    sep.className = 'habit-done-sep';
-    sep.innerHTML = '<span>completed</span>';
-    goodList.appendChild(sep);
+
+  if (activeGoal) {
+    const goalSched = _sortHabits(scheduled.filter(h =>  h.goalSource));
+    const mySched   = _sortHabits(scheduled.filter(h => !h.goalSource));
+
+    if (goalSched.length > 0) {
+      const goal = GOALS.find(g => g.id === activeGoal.goalId);
+      const hdr = document.createElement('div');
+      hdr.className = 'goal-today-hdr';
+      hdr.innerHTML = `<span class="gth-icon">${goal.icon}</span><span class="gth-name">${esc(goal.name)}</span><button class="gth-link" type="button" onclick="navigate('goals')">Stage ${activeGoal.stage} · details →</button>`;
+      goodList.appendChild(hdr);
+    }
+
+    const _appendSection = (list, doneLabel) => {
+      const undone = list.filter(h => !h.checks?.[tk]);
+      const done   = list.filter(h =>  h.checks?.[tk]);
+      undone.forEach(h => goodList.appendChild(_buildHCard(h, tk, false)));
+      if (undone.length > 0 && done.length > 0) {
+        const sep = document.createElement('div');
+        sep.className = 'habit-done-sep';
+        sep.innerHTML = `<span>${doneLabel}</span>`;
+        goodList.appendChild(sep);
+      }
+      done.forEach(h => goodList.appendChild(_buildHCard(h, tk, false)));
+    };
+
+    _appendSection(goalSched, 'completed');
+
+    if (mySched.length > 0) {
+      const mySep = document.createElement('div');
+      mySep.className = 'my-habits-sep';
+      mySep.innerHTML = '<span>My Habits</span>';
+      goodList.appendChild(mySep);
+      _appendSection(mySched, 'completed');
+    }
+  } else {
+    const _sorted = _sortHabits(scheduled);
+    const _undone = _sorted.filter(h => !h.checks?.[tk]);
+    const _done   = _sorted.filter(h =>  h.checks?.[tk]);
+    _undone.forEach(h => goodList.appendChild(_buildHCard(h, tk, false)));
+    if (_undone.length > 0 && _done.length > 0) {
+      const sep = document.createElement('div');
+      sep.className = 'habit-done-sep';
+      sep.innerHTML = '<span>completed</span>';
+      goodList.appendChild(sep);
+    }
+    _done.forEach(h => goodList.appendChild(_buildHCard(h, tk, false)));
   }
-  _done.forEach(h => goodList.appendChild(_buildHCard(h, tk, false)));
 
   if (bonuses.length > 0) {
     const bonusList = document.getElementById('bonusList');
@@ -678,4 +715,96 @@ function _renderBadgesGrid() {
   document.getElementById('badgesTitle').textContent =
     'Badges · ' + earnedBadges.length + ' of ' + BADGES.length;
 }
+
+// ── Goals screen ────────────────────────────
+
+function renderGoals() {
+  const screen = document.getElementById('screenGoals');
+  if (!screen) return;
+  screen.innerHTML = activeGoal ? _buildActiveGoalView() : _buildGoalsList();
+}
+
+function _buildGoalsList() {
+  return `<div class="goals-wrap">
+    <h2 class="goals-title">Choose a goal</h2>
+    <p class="goals-sub">A ready-made 63-day track — habits that will lead to results step by step.</p>
+    <div class="goals-list">
+      ${GOALS.map(g => `
+        <div class="goal-card">
+          <div class="goal-card-top">
+            <span class="goal-card-icon">${g.icon}</span>
+            <div class="goal-card-info">
+              <div class="goal-card-name">${esc(g.name)}</div>
+              <div class="goal-card-meta">63 days · 3 stages · 9 habits</div>
+            </div>
+          </div>
+          <p class="goal-card-desc">${esc(g.desc)}</p>
+          <p class="goal-card-result">${esc(g.result)}</p>
+          <button type="button" class="btn btn-primary goal-card-btn" onclick="openGoalSurvey('${g.id}')">Start →</button>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function _buildActiveGoalView() {
+  const goal = GOALS.find(g => g.id === activeGoal.goalId);
+  if (!goal) return '';
+
+  const d1   = new Date(activeGoal.startedAt);
+  const d2   = new Date(_todayKey());
+  const dayN = Math.floor((d2 - d1) / 86400000) + 1;
+  const pct  = Math.min(100, Math.round(dayN / 63 * 100));
+
+  const stagesHtml = goal.stages.map(s => {
+    if (s.n > activeGoal.stage) {
+      return `<div class="gsi gsi-locked">
+        <div class="gsi-head">
+          <span class="gsi-num">Stage ${s.n}</span>
+          <span class="gsi-name">${esc(s.name)}</span>
+          <span class="gsi-days">Days ${s.days}</span>
+          <span class="gsi-lock">🔒</span>
+        </div>
+      </div>`;
+    }
+    const stageHabits = habits.filter(h => h.goalId === activeGoal.goalId && h.goalStage === s.n && !h.bad);
+    const allDone = stageHabits.length > 0 && stageHabits.every(h => _goalHabitChecks(h) >= 21);
+    const habitsHtml = stageHabits.map(h => {
+      const cnt  = _goalHabitChecks(h);
+      const pctH = Math.min(100, Math.round(cnt / 21 * 100));
+      return `<div class="gsi-habit">
+        <span class="gsi-habit-icon">${h.icon || '🎯'}</span>
+        <span class="gsi-habit-name">${esc(h.name)}</span>
+        <span class="gsi-habit-cnt">${cnt}/21</span>
+        <div class="gsi-habit-bar"><div class="gsi-habit-fill" style="width:${pctH}%"></div></div>
+      </div>`;
+    }).join('');
+    return `<div class="gsi ${allDone ? 'gsi-done' : 'gsi-active'}">
+      <div class="gsi-head">
+        <span class="gsi-num">Stage ${s.n}</span>
+        <span class="gsi-name">${esc(s.name)}</span>
+        <span class="gsi-days">Days ${s.days}</span>
+        ${allDone ? '<span class="gsi-check">✓</span>' : ''}
+      </div>
+      <p class="gsi-desc">${esc(s.desc)}</p>
+      <div class="gsi-habits">${habitsHtml}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="goals-wrap">
+    <div class="goal-active-hdr">
+      <span class="gah-icon">${goal.icon}</span>
+      <div class="gah-info">
+        <div class="gah-name">${esc(goal.name)}</div>
+        <div class="gah-day">Day ${dayN} of 63</div>
+      </div>
+    </div>
+    <div class="goal-prog-wrap">
+      <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%"></div></div>
+      <span class="goal-prog-pct">${pct}%</span>
+    </div>
+    <div class="goal-stages">${stagesHtml}</div>
+    <button type="button" class="btn btn-ghost goal-abandon-btn" onclick="confirmAbandonGoal()">Stop goal</button>
+  </div>`;
+}
+
 

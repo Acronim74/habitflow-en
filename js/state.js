@@ -28,6 +28,9 @@ let _createNight = false;
 let notificationEnabled = false;
 let notificationTime    = '21:00';
 
+// ── Active goal ──────────────────────────────
+let activeGoal = null; // { goalId, stage, startedAt, stageStartedAt: {1: date, 2: null, 3: null} }
+
 // ── Сохранение ─────────────────────────────
 function saveData() {
   try {
@@ -43,6 +46,7 @@ function saveData() {
       seriesWidgetEnabled,
       notificationEnabled,
       notificationTime,
+      activeGoal,
       savedAt: new Date().toISOString(),
     };
     localStorage.setItem(LS_KEY, JSON.stringify(data));
@@ -71,6 +75,7 @@ function loadData() {
     seriesWidgetEnabled = d.seriesWidgetEnabled === undefined ? true : !!d.seriesWidgetEnabled;
     notificationEnabled = d.notificationEnabled || false;
     notificationTime    = typeof d.notificationTime === 'string' ? d.notificationTime : '21:00';
+    activeGoal          = d.activeGoal || null;
     _migrateData();
     _syncCleanTodaySetFromData();
   } catch (_e) {
@@ -99,8 +104,13 @@ function _migrateData() {
     if (!h.category)  h.category = '';
     if (!h.icon)      h.icon     = h.bad ? '🚫' : '⭐';
     if (!h.createdAt) h.createdAt = _todayKey();
-    if (h.schedule === undefined) h.schedule = null;
-    if (h.night === undefined) h.night = false;
+    if (h.schedule === undefined)      h.schedule      = null;
+    if (h.night === undefined)         h.night         = false;
+    if (h.goalSource === undefined)    h.goalSource    = false;
+    if (h.goalId === undefined)        h.goalId        = null;
+    if (h.goalStage === undefined)     h.goalStage     = 0;
+    if (h.goalHabitKey === undefined)  h.goalHabitKey  = null;
+    if (h._archivedByGoal === undefined) h._archivedByGoal = false;
   });
 
   let moodMigrateDirty = false;
