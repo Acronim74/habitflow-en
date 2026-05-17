@@ -6,21 +6,17 @@ let _deferredInstallPrompt = null;
 let _pwaInstalledThisSession = false;
 
 let _obStep = 0;
-const _OB_TOTAL = 9;
+const _OB_TOTAL = 5;
 const _ONBOARDING_DONE_KEY = 'habitflow_onboarding_done';
 let _lastNetworkOnline = null;
 
 /** Короткие заголовки для строки прогресса (как в макете). */
 const _OB_HEADINGS = [
   'WELCOME',
-  'TRACKING',
-  'NOTES',
-  'CREATING A HABIT',
-  'STREAKS & POINTS',
-  'ANALYTICS & BADGES',
-  'SETTINGS MENU',
-  'INSTALL THE APP',
-  'YOUR DATA',
+  'GOALS',
+  'HABITS',
+  'INSTALL',
+  'GET STARTED',
 ];
 
 function _updateTopBarMeta() {
@@ -1676,9 +1672,9 @@ function _obFooterRender() {
       <button type="button" class="ob-btn-back"
               onclick="obPrev()">← Back</button>
       <button type="button" class="ob-btn-demo"
-              onclick="loadDemoData()">Demo data</button>
+              onclick="obSkip()">No goal yet</button>
       <button type="button" class="ob-btn-next"
-              onclick="obSkip()">Get started!</button>`;
+              onclick="obGoToGoals()">Choose a goal →</button>`;
   } else {
     footer.innerHTML = `
       <button type="button" class="ob-btn-back"
@@ -1714,6 +1710,15 @@ function obSkip() {
   if (el) el.style.display = 'none';
   localStorage.setItem(_ONBOARDING_DONE_KEY, '1');
   saveData();
+  renderAll();
+}
+
+function obGoToGoals() {
+  const el = document.getElementById('onboardingScreen');
+  if (el) el.style.display = 'none';
+  localStorage.setItem(_ONBOARDING_DONE_KEY, '1');
+  saveData();
+  navigate('goals');
   renderAll();
 }
 
@@ -1770,25 +1775,61 @@ function loadDemoData() {
 function _obSteps() {
   return [
 
+    // ── Step 1: Welcome ──
     `<div class="ob-ico">🌿</div>
      <div class="ob-title">Welcome to HabitFlow</div>
      <div class="ob-text">A habit tracker that works fully offline.
        Your data is stored only on this device — no servers, no subscriptions.</div>
      <div class="ob-hint">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">We'll show you how everything works in a minute.
+       <div class="ob-hint-text">We'll cover the essentials in 4 steps.
          Or just dive in — it's all intuitive.</div>
      </div>`,
 
+    // ── Step 2: Goals ──
+    `<div class="ob-ico">🎯</div>
+     <div class="ob-title">Choose a goal — get a plan</div>
+     <div class="ob-text">Three ready-made 63-day tracks. Each splits into 3 stages of 21 days —
+       habits are added automatically, one level at a time.</div>
+     <div class="ob-goals-preview">
+       <div class="ob-goal-item">
+         <span class="ob-goal-ico">⚡</span>
+         <div>
+           <div class="ob-goal-name">More Energy</div>
+           <div class="ob-goal-stages">Foundation · Activation · Optimization</div>
+         </div>
+       </div>
+       <div class="ob-goal-item">
+         <span class="ob-goal-ico">💰</span>
+         <div>
+           <div class="ob-goal-name">Spend Smarter</div>
+           <div class="ob-goal-stages">Awareness · Control · Growth</div>
+         </div>
+       </div>
+       <div class="ob-goal-item">
+         <span class="ob-goal-ico">🧘</span>
+         <div>
+           <div class="ob-goal-name">Feel Calmer</div>
+           <div class="ob-goal-stages">Grounding · Regulation · Resilience</div>
+         </div>
+       </div>
+     </div>
+     <div class="ob-hint">
+       <div class="ob-hint-ico">💡</div>
+       <div class="ob-hint-text">When you pick a goal, your existing habits move to archive —
+         the goal's habits take their place. You can restore them anytime.</div>
+     </div>`,
+
+    // ── Step 3: Track habits ──
     `<div class="ob-ico">✅</div>
      <div class="ob-title">Track your habits</div>
-     <div class="ob-text">Tap the button on the right — the card will flip and
-       show the time you checked in. Tap "undo" to remove the check.</div>
+     <div class="ob-text">Tap the button on the right — the card flips and shows
+       when you checked in. Tap "undo" to remove the check.</div>
      <div class="ob-preview">
        <div class="ob-card-front">
          <div class="ob-card-row">
            <div class="ob-card-body">
-             <div class="ob-card-name">🏃 Morning run</div>
+             <div class="ob-card-name">💧 Glass of water</div>
              <div class="ob-card-sub">Start your streak today</div>
            </div>
            <div class="ob-card-check">
@@ -1808,210 +1849,56 @@ function _obSteps() {
      </div>
      <div class="ob-hint">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">For bad habits — two buttons:
-         ✓ Held strong or ✕ Had a slip.</div>
+       <div class="ob-hint-text">Streaks earn points and unlock badges.
+         The longer the streak — the bigger the multiplier.</div>
      </div>`,
 
-    `<div class="ob-ico">💬</div>
-     <div class="ob-title">Notes on habits</div>
-     <div class="ob-text">Once a habit is done, a 💬 button appears — tap it to leave a short note about how it went.</div>
-     <div class="ob-preview" style="flex-direction:column;align-items:stretch;gap:8px">
-       <div class="ob-card-back" style="border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
-         <div class="ob-card-back-ico">✓</div>
-         <div style="flex:1">
-           <div class="ob-card-back-title">Done!</div>
-           <div class="ob-card-back-time">07:24</div>
-         </div>
-         <div style="display:flex;flex-direction:column;gap:5px;align-items:center">
-           <div style="font-size:14px;border:0.5px solid rgba(255,255,255,.3);border-radius:6px;padding:2px 7px;cursor:pointer">💬</div>
-           <div class="ob-card-back-undo">undo</div>
-         </div>
-       </div>
-       <div class="ob-card-back" style="border-radius:10px;padding:10px 14px;background:var(--surface)">
-         <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">
-           💬 2 notes <span style="margin-left:auto">▾</span>
-         </div>
-         <div style="margin-top:6px;font-size:11px;color:var(--text2)">
-           <div style="padding:3px 0;border-bottom:0.5px solid var(--border)">3 May · Got up easily, no hesitation</div>
-           <div style="padding:3px 0">2 May · Rainy day, ran around the park</div>
-         </div>
-       </div>
-     </div>
-     <div class="ob-hint">
-       <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Past notes appear below the card — tap to expand.
-         Great for spotting patterns over time.</div>
-     </div>`,
-
-    `<div class="ob-ico-plus" aria-hidden="true">+</div>
-     <div class="ob-title">How to create a habit</div>
-     <div class="ob-text">Tap "Add habit" — a form will open. Here's what's in it:</div>
-     <div class="ob-preview ob-preview-create">
-       <div class="ob-preview-label">Habit type</div>
-       <div class="ob-type-row">
-         <div class="ob-type-btn good">
-           <span class="ob-type-glyph" aria-hidden="true">✓</span>
-           Good
-         </div>
-         <div class="ob-type-btn bad">
-           <span class="ob-type-glyph" aria-hidden="true">🚫</span>
-           Bad
-         </div>
-       </div>
-       <div class="ob-preview-label">Icon</div>
-       <div class="ob-icon-row">
-         <div class="ob-icon-btn sel">🏃</div>
-         <div class="ob-icon-btn">📚</div>
-         <div class="ob-icon-btn">🧘</div>
-         <div class="ob-icon-btn">💪</div>
-         <div class="ob-icon-btn">💧</div>
-         <div class="ob-icon-btn">😴</div>
-         <div class="ob-icon-btn">🚫</div>
-         <div class="ob-icon-btn">🚬</div>
-       </div>
-       <div class="ob-preview-label">Name</div>
-       <div class="ob-field ob-field-placeholder">Morning run</div>
-       <div class="ob-preview-label">Schedule</div>
-       <div class="ob-sched-row">
-         <div class="ob-sched-btn sel">Every day</div>
-         <div class="ob-sched-btn">Weekdays</div>
-         <div class="ob-sched-btn">Weekend</div>
-         <div class="ob-sched-btn">Custom</div>
-       </div>
-     </div>
-     <div class="ob-hint">
-       <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Schedule affects day progress. A "Weekdays" habit
-         doesn't count as missed on weekends — but you can still mark it as a bonus.</div>
-     </div>
-     <div class="ob-hint">
-       <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Bad habits don't have a schedule — they are
-         tracked every day.</div>
-     </div>`,
-
-    `<div class="ob-ico">🔥</div>
-     <div class="ob-title">Streaks &amp; points</div>
-     <div class="ob-text">Every check earns points.
-       The longer the streak — the bigger the multiplier.</div>
-     <div class="ob-pts-row">
-       <span class="ob-pts-pill good">Good +10 pts</span>
-       <span class="ob-pts-pill bad">Bad +5 pts</span>
-       <span class="ob-pts-pill bonus">Bonus +10 pts</span>
-     </div>
-     <div class="ob-mult-card">
-       7+ days in a row → <strong style="color:var(--accent)">×2</strong><br>
-       30+ days in a row → <strong style="color:var(--accent)">×3</strong><br>
-       100+ days in a row → <strong style="color:var(--accent)">×5</strong>
-     </div>
-     <div class="ob-hint" style="margin-top:10px">
-       <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Complete all habits for the day —
-         bonus +25 pts.</div>
-     </div>`,
-
-    `<div class="ob-ico">📊</div>
-     <div class="ob-title">Analytics &amp; badges</div>
-     <div class="ob-text">Analytics shows heatmaps for the week, month,
-       quarter or year. In badges — your character grows as you earn points.</div>
-     <div class="ob-badge-row">
-       <div class="ob-badge-item">
-         <div class="ob-badge-ico">🔥</div>
-         <div class="ob-badge-lbl">First Fire</div>
-       </div>
-       <div class="ob-badge-item">
-         <div class="ob-badge-ico">💎</div>
-         <div class="ob-badge-lbl">Diamond</div>
-       </div>
-       <div class="ob-badge-item">
-         <div class="ob-badge-ico locked">🏆</div>
-         <div class="ob-badge-lbl">Champion</div>
-       </div>
-       <div class="ob-badge-item">
-         <div class="ob-badge-ico locked">⚡</div>
-         <div class="ob-badge-lbl">Centurion</div>
-       </div>
-       <div class="ob-badge-item">
-         <div class="ob-badge-ico locked">🍀</div>
-         <div class="ob-badge-lbl">Lucky</div>
-       </div>
-     </div>
-     <div class="ob-hint">
-       <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Stages: Beginner → In the Flow → Steady →
-         Habit Force → Pillar → Master</div>
-     </div>`,
-
-    `<div class="ob-ico">☰</div>
-     <div class="ob-title">Settings menu</div>
-     <div class="ob-text">Tap the ☰ button in the top-right corner —
-       the app settings menu will open.</div>
-     <div class="ob-data-row">
-       <div class="ob-data-ico">🎨</div>
-       <div class="ob-data-text">Theme — four options:
-         Light, Dark, Forest and Veloce</div>
-     </div>
-     <div class="ob-data-row">
-       <div class="ob-data-ico">📊</div>
-       <div class="ob-data-text">Widgets — toggle progress, personal best
-         and mood cards on or off</div>
-     </div>
-     <div class="ob-data-row">
-       <div class="ob-data-ico">💾</div>
-       <div class="ob-data-text">Data — export and import backup files</div>
-     </div>
-     <div class="ob-data-row">
-       <div class="ob-data-ico">🎓</div>
-       <div class="ob-data-text">Tour — reopen this tour
-         at any time</div>
-     </div>`,
-
+    // ── Step 4: Install ──
     `<div class="ob-ico">📲</div>
      <div class="ob-title">Install as an app</div>
-     <div class="ob-text">HabitFlow can be installed on your phone or desktop —
-       it works like a native app without a browser bar.</div>
+     <div class="ob-text">HabitFlow works as a PWA — install it on your phone or desktop.
+       No app store needed, works fully offline.</div>
+     <div class="ob-install-block">
+       <button type="button" class="ob-btn-install" id="obPwaInstallBtn"
+               onclick="pwaTryInstall()">Install app</button>
+       <p class="ob-install-fallback" id="obPwaInstallFallback" hidden></p>
+     </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">🤖</div>
-       <div class="ob-data-text"><b>Android:</b> open in Chrome →
-         menu ⋮ → "Add to Home Screen"</div>
+       <div class="ob-data-text"><b>Android:</b> Chrome → menu ⋮ → "Add to Home Screen"</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">🍎</div>
-       <div class="ob-data-text"><b>iPhone:</b> open in Safari →
-         Share button → "Add to Home Screen"</div>
+       <div class="ob-data-text"><b>iPhone:</b> Safari → Share button → "Add to Home Screen"</div>
      </div>
      <div class="ob-data-row">
        <div class="ob-data-ico">💻</div>
-       <div class="ob-data-text"><b>Desktop (Chrome/Edge):</b> tap the install
-         icon in the address bar →
-         "Install"</div>
-     </div>
-     <div class="ob-hint" style="margin-top:8px">
-       <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Once installed, the app works
-         fully offline — data stays on your device.</div>
+       <div class="ob-data-text"><b>Desktop:</b> Chrome/Edge → install icon in the address bar</div>
      </div>`,
 
-    `<div class="ob-ico">💾</div>
-     <div class="ob-title">Your data is safe</div>
-     <div class="ob-text">Everything is stored locally on this device.
-       Use the backup buttons in the menu to save copies.</div>
-     <div class="ob-data-row">
-       <div class="ob-data-ico">💾</div>
-       <div class="ob-data-text">Export — download a backup file (.json)</div>
+    // ── Step 5: Ready ──
+    `<div class="ob-ico">🚀</div>
+     <div class="ob-title">Ready — let's go?</div>
+     <div class="ob-text">Pick a goal — the first three habits will be added automatically.
+       Every 21 days the next stage unlocks.</div>
+     <div class="ob-goals-final">
+       <div class="ob-final-row">
+         <span class="ob-final-num">21</span>
+         <span class="ob-final-label">days — first stage</span>
+       </div>
+       <div class="ob-final-row">
+         <span class="ob-final-num">3</span>
+         <span class="ob-final-label">habits at a time — not overwhelming</span>
+       </div>
+       <div class="ob-final-row">
+         <span class="ob-final-num">63</span>
+         <span class="ob-final-label">days to real results</span>
+       </div>
      </div>
-     <div class="ob-data-row">
-       <div class="ob-data-ico">📂</div>
-       <div class="ob-data-text">Import — restore from a file</div>
-     </div>
-     <div class="ob-data-row">
-       <div class="ob-data-ico">❓</div>
-       <div class="ob-data-text">Help — full documentation</div>
-     </div>
-     <div class="ob-hint" style="margin-top:4px">
+     <div class="ob-hint">
        <div class="ob-hint-ico">💡</div>
-       <div class="ob-hint-text">Try the demo data to see the app
-         in action — you can delete it any time.</div>
+       <div class="ob-hint-text">Want to start without a goal? Add your own habits
+         with the "+" button on the Habits screen.</div>
      </div>`,
   ];
 }
