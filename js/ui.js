@@ -1916,8 +1916,8 @@ const GUIDE_MODAL_HTML = `
 
   <div class="card">
     <div class="card-title">☀️ Today</div>
-    <p>Main screen. Shows day progress, habit cards and stats.
-    Check off habits here — the card flips to show the completion time.</p>
+    <p>Main screen. Day progress, habit cards and widgets.
+    If a goal is active — goal habits appear first in their own block, your custom habits below.</p>
   </div>
 
   <div class="card">
@@ -1927,10 +1927,16 @@ const GUIDE_MODAL_HTML = `
   </div>
 
   <div class="card">
+    <div class="card-title">🎯 Goals</div>
+    <p>Three ready-made 63-day tracks: "More Energy", "Spend Smarter", "Feel Calmer".
+    Each splits into 3 stages of 21 days — habits are added automatically as you progress.</p>
+  </div>
+
+  <div class="card">
     <div class="card-title">📊 Analytics</div>
     <p>Activity heatmaps for the week, month, quarter or year.
     Separate maps for good and bad habits.
-    If the mood journal is on — a mood line chart appears too.</p>
+    With the mood journal on — a mood line chart appears too.</p>
   </div>
 
   <div class="card">
@@ -1939,12 +1945,32 @@ const GUIDE_MODAL_HTML = `
     Habit Force → Pillar → Master. Earn badges for specific milestones.</p>
   </div>
 
+  <h2>Goals &amp; roadmaps</h2>
+
+  <div class="card">
+    <div class="card-title">How goals work</div>
+    <p>Pick a goal — the first stage habits (3 of them) are added right away.
+    Your existing habits move to archive while the goal is active.</p>
+    <div class="divider"></div>
+    <p>Complete each habit <strong>21 times</strong> — the stage is done and the next one
+    unlocks automatically with fresh habits.</p>
+    <div class="divider"></div>
+    <p>Three stages × 21 days = <strong>63 days</strong> to the full result.
+    Stop the goal at any time — your habits return from archive.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Habit descriptions</div>
+    <p>Each goal habit shows a <em>why</em> — the science behind why it works — plus
+    a frequency tag. This helps you understand what you're building, not just follow a list.</p>
+  </div>
+
   <h2>Habit types</h2>
 
   <div class="card">
     <span class="tag tag-good">Good</span>
-    <p>Tap the button on the right — the card flips. Shows the check-in time and an
-    "undo" button. Check in every day to build a streak.</p>
+    <p>Tap the button on the right — the card flips. Shows the check-in time and an "undo" button.
+    Check in every day to build your streak.</p>
     <div class="divider"></div>
     <p><span class="pts">+10 pts</span> per check &nbsp;·&nbsp;
     <span class="pts">+25 pts</span> if you complete all habits for the day</p>
@@ -1960,8 +1986,8 @@ const GUIDE_MODAL_HTML = `
 
   <div class="card">
     <span class="tag tag-bonus">Bonus</span>
-    <p>A good habit with a schedule (e.g. "Weekdays"). On off-days it becomes
-    a bonus — you can check it voluntarily and earn extra points.</p>
+    <p>A good habit with a schedule (e.g. "Weekdays"). On off-days it becomes a bonus —
+    check it voluntarily and earn extra points.</p>
     <div class="divider"></div>
     <p><span class="pts">+10 pts</span> for a bonus check</p>
   </div>
@@ -1980,27 +2006,38 @@ const GUIDE_MODAL_HTML = `
   <h2>Schedule</h2>
 
   <div class="card">
-    <p>When creating a habit you can pick a schedule: every day, weekdays, weekend
-    or custom days. On days the habit isn't scheduled — it doesn't affect progress,
-    but you can still check it in as a bonus.</p>
+    <p>When creating a habit pick a schedule: every day, weekdays, weekend or custom days.
+    On unscheduled days the habit doesn't affect progress, but you can still check it as a bonus.</p>
+    <div class="divider"></div>
+    <p>Goal habits have no schedule — they're active every day.</p>
+  </div>
+
+  <h2>News &amp; updates</h2>
+
+  <div class="card">
+    <p>📰 The <strong>News</strong> button in the ☰ menu — habit tips and a full list of
+    app updates.</p>
+    <div class="divider"></div>
+    <p>When a new version ships, a compact "What's new" modal appears — dismiss it with ✕
+    and it won't show again. Everything stays available in the News feed.</p>
   </div>
 
   <h2>Data &amp; backups</h2>
 
   <div class="card">
-    <p>Data is stored in the browser on this device. If you clear browser data —
-    history may be lost.</p>
+    <p>Data is stored in the browser on this device. Clearing browser data may cause
+    history to be lost.</p>
     <div class="divider"></div>
-    <p>💾 <strong>Export</strong> — downloads a backup file (.json)<br>
-    📂 <strong>Import</strong> — loads a previously saved file.<br>
+    <p>💾 <strong>Save backup</strong> — downloads a backup file (.json)<br>
+    📂 <strong>Load backup</strong> — restores from a file.<br>
     Back up regularly, especially before updating the browser.</p>
   </div>
 
   <h2>Themes</h2>
 
   <div class="card">
-    <p>The theme switcher is in the menu next to the avatar.
-    Four themes available: ☀️ Light, 🌙 Dark, 🌿 Forest, ◈ Veloce.</p>
+    <p>Theme switcher is in the ☰ menu.
+    Four themes: ☀️ Light, 🌙 Dark, 🌿 Forest, ◈ Veloce.</p>
   </div>
 
   <p class="footer">HabitFlow · works fully offline</p>
