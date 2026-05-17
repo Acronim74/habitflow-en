@@ -1789,7 +1789,7 @@ function _obSteps() {
     // ── Step 2: Goals ──
     `<div class="ob-ico">🎯</div>
      <div class="ob-title">Choose a goal — get a plan</div>
-     <div class="ob-text">Three ready-made 63-day tracks. Each splits into 3 stages of 21 days —
+     <div class="ob-text">Five ready-made 63-day tracks. Each splits into 3 stages of 21 days —
        habits are added automatically, one level at a time.</div>
      <div class="ob-goals-preview">
        <div class="ob-goal-item">
@@ -1811,6 +1811,20 @@ function _obSteps() {
          <div>
            <div class="ob-goal-name">Feel Calmer</div>
            <div class="ob-goal-stages">Grounding · Regulation · Resilience</div>
+         </div>
+       </div>
+       <div class="ob-goal-item">
+         <span class="ob-goal-ico">😴</span>
+         <div>
+           <div class="ob-goal-name">Sleep Repair</div>
+           <div class="ob-goal-stages">Rhythm · Quality · Recovery</div>
+         </div>
+       </div>
+       <div class="ob-goal-item">
+         <span class="ob-goal-ico">📵</span>
+         <div>
+           <div class="ob-goal-name">No Social Spiral</div>
+           <div class="ob-goal-stages">Awareness · Control · Replacement</div>
          </div>
        </div>
      </div>
@@ -1928,7 +1942,8 @@ const GUIDE_MODAL_HTML = `
 
   <div class="card">
     <div class="card-title">🎯 Goals</div>
-    <p>Three ready-made 63-day tracks: "More Energy", "Spend Smarter", "Feel Calmer".
+    <p>Five ready-made 63-day tracks: "More Energy", "Spend Smarter", "Feel Calmer",
+    "Sleep Repair", "No Social Spiral".
     Each splits into 3 stages of 21 days — habits are added automatically as you progress.</p>
   </div>
 

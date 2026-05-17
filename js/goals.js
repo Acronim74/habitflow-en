@@ -121,4 +121,84 @@ const GOALS = [
       { key: 's2', q: 'Already going for a walk outside every day?', skip: '1.3' },
     ],
   },
+  {
+    id: 'sleep-repair',
+    icon: '😴',
+    name: 'Sleep Repair',
+    desc: 'Fall asleep faster, wake up rested — no sleeping pills, no forcing a schedule.',
+    result: 'Consistent wake time · Asleep in 15 minutes · Wake up without an alarm',
+    stages: [
+      {
+        n: 1, name: 'Rhythm', days: '1–21',
+        desc: 'Set a baseline sleep rhythm with three simple changes to your environment and behavior.',
+        habits: [
+          { key: '1.1', icon: '⏰', name: 'Wake up at the same time every day' },
+          { key: '1.2', icon: '📵', name: 'No screens 45 minutes before bed' },
+          { key: '1.3', icon: '🌙', name: 'Cool and dark room for sleeping' },
+        ],
+      },
+      {
+        n: 2, name: 'Quality', days: '22–42',
+        desc: 'Improve sleep depth through an evening ritual and caffeine management.',
+        habits: [
+          { key: '2.1', icon: '🛁', name: 'Evening ritual — the same 20 minutes before bed' },
+          { key: '2.2', icon: '☕', name: 'No caffeine after 2 PM' },
+          { key: '2.3', icon: '📓', name: 'Write down thoughts and tasks before bed' },
+        ],
+      },
+      {
+        n: 3, name: 'Recovery', days: '43–63',
+        desc: 'Lock in your gains and learn to track the quality of your rest.',
+        habits: [
+          { key: '3.1', icon: '☀️', name: 'Morning light right after waking — 10 minutes' },
+          { key: '3.2', icon: '🏃', name: '20 minutes of movement during the day' },
+          { key: '3.3', icon: '📊', name: 'Morning sleep quality rating — 1 minute' },
+        ],
+      },
+    ],
+    survey: [
+      { key: 's1', q: 'Already waking up at the same time every day?', skip: '1.1' },
+      { key: 's2', q: 'Already keeping screens away for an hour before bed?', skip: '1.2' },
+    ],
+  },
+  {
+    id: 'no-social-spiral',
+    icon: '📵',
+    name: 'No Social Spiral',
+    desc: 'Stop the endless scroll — reclaim your attention, time and peace of mind.',
+    result: 'Under 1 hour on social media · Phone-free mornings · Day without background anxiety',
+    stages: [
+      {
+        n: 1, name: 'Awareness', days: '1–21',
+        desc: 'See the real picture — how much time is going where and when.',
+        habits: [
+          { key: '1.1', icon: '📱', name: 'Check screen time and write down the number' },
+          { key: '1.2', icon: '🌅', name: 'No phone for the first 20 minutes after waking up' },
+          { key: '1.3', icon: '🔕', name: 'One hour per day completely phone-free' },
+        ],
+      },
+      {
+        n: 2, name: 'Control', days: '22–42',
+        desc: 'Set boundaries and reshape your environment so your phone stops grabbing attention on its own.',
+        habits: [
+          { key: '2.1', icon: '⏱️', name: 'Set a daily limit for social media apps' },
+          { key: '2.2', icon: '🕐', name: 'Social media only at designated times — not as background' },
+          { key: '2.3', icon: '📂', name: 'Remove social media apps from the phone\'s home screen' },
+        ],
+      },
+      {
+        n: 3, name: 'Replacement', days: '43–63',
+        desc: 'Fill the freed time with things you genuinely enjoy — and lock in the new pattern.',
+        habits: [
+          { key: '3.1', icon: '📚', name: 'Replace scrolling with a specific alternative' },
+          { key: '3.2', icon: '🗓️', name: 'One full day per week without social media' },
+          { key: '3.3', icon: '📉', name: 'Weekly screen time review — is it going down?' },
+        ],
+      },
+    ],
+    survey: [
+      { key: 's1', q: 'Already leaving your phone alone for the first 20 minutes after waking?', skip: '1.2' },
+      { key: 's2', q: 'Already tracking your screen time every day?', skip: '1.1' },
+    ],
+  },
 ];
